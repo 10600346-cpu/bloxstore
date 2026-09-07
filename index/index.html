@@ -58,7 +58,7 @@
         .start-btn:hover { background-color: rgba(255,255,255,0.1); }
         .start-btn svg { width: 16px; height: 16px; fill: white; }
         
-        /* Bandeja del sistema (System Tray) */
+        /* Bandeja del sistema */
         .system-tray {
             display: flex;
             align-items: center;
@@ -183,45 +183,50 @@
     </div>
 
     <script>
-        // Control de la pantalla de carga (Ya no se queda bloqueado)
+        // Control de la pantalla de carga (Ejecución forzada sin fallos)
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const bootScreen = document.getElementById('boot-screen');
-                bootScreen.style.opacity = '0';
-                setTimeout(() => {
-                    bootScreen.style.display = 'none';
-                }, 500);
-            }, 3000); // 3 segundos de carga inicial
+                if (bootScreen) {
+                    bootScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        bootScreen.style.display = 'none';
+                    }, 500);
+                }
+            }, 3000); // Se quita automáticamente a los 3 segundos
             
             actualizarReloj();
             setInterval(actualizarReloj, 1000);
             inicializarHardware();
         });
 
-        // Actualización del reloj del sistema (Bug solucionado aquí)
+        // Reloj del sistema limpio
         function actualizarReloj() {
             const ahora = new Date();
             let horas = ahora.getHours();
             let minutos = ahora.getMinutes();
             let dia = ahora.getDate();
-            let mes = now = ahora.getMonth() + 1;
+            let mes = ahora.getMonth() + 1;
             let anio = ahora.getFullYear();
 
             horas = horas < 10 ? '0' + horas : horas;
-            minutos = minutos < 10 ? '0' + minutos : minutos; // Corregido 'minutes' a 'minutos'
+            minutos = minutos < 10 ? '0' + minutos : minutos;
             dia = dia < 10 ? '0' + dia : dia;
             mes = mes < 10 ? '0' + mes : mes;
 
-            document.getElementById('taskbar-time').innerText = `${horas}:${minutos}`;
-            document.getElementById('taskbar-date').innerText = `${dia}/${mes}/${anio}`;
+            const timeEl = document.getElementById('taskbar-time');
+            const dateEl = document.getElementById('taskbar-date');
+            if (timeEl) timeEl.innerText = `${horas}:${minutos}`;
+            if (dateEl) dateEl.innerText = `${dia}/${mes}/${anio}`;
         }
 
         // Alternar menús emergentes de la barra de tareas
         function togglePopover(event, id) {
             if (event) event.stopPropagation();
             const popover = document.getElementById(id);
-            const estaAbierto = popover.style.display === 'block';
+            if (!popover) return;
             
+            const estaAbierto = popover.style.display === 'block';
             cerrarTodosLosPopovers();
             
             if (!estaAbierto) {
@@ -235,36 +240,36 @@
             });
         }
 
-        // Acciones al pulsar en el escritorio o menú inicio
+        // Eventos del escritorio
         document.getElementById('desktop').addEventListener('click', cerrarTodosLosPopovers);
         document.getElementById('startBtn').addEventListener('click', (e) => {
             e.stopPropagation();
-            alert("Menú de Inicio Windows 10 Pro cargado correctamente.");
+            alert("Menú de Inicio Windows 10 Pro activo.");
         });
 
-        // Telemetría nativa de Hardware (Wi-Fi y Batería de Laptop)
+        // Telemetría de hardware (Compatible con ChromeOS/Chromebook)
         function inicializarHardware() {
-            // Monitor de red Wi-Fi
             function verificarConexion() {
                 const online = navigator.onLine;
                 const statusTxt = document.getElementById('wifi-status');
                 const icon = document.getElementById('wifi-icon');
                 
-                if (online) {
-                    statusTxt.innerText = "Conectado a Internet (Acceso Seguro Windows)";
-                    icon.innerText = "📶";
-                } else {
-                    statusTxt.innerText = "Desconectado - Sin acceso a la red";
-                    icon.innerText = "❌";
+                if (statusTxt && icon) {
+                    if (online) {
+                        statusTxt.innerText = "Conectado a Internet (Acceso Seguro Windows)";
+                        icon.innerText = "📶";
+                    } else {
+                        statusTxt.innerText = "Desconectado - Sin acceso a la red";
+                        icon.innerText = "❌";
+                    }
                 }
             }
             window.addEventListener('online', verificarConexion);
             window.addEventListener('offline', verificarConexion);
             verificarConexion();
 
-            // Medidor de batería real
             if ('getBattery' in navigator) {
                 navigator.getBattery().then(function(battery) {
                     function updateBatteryInfo() {
                         const porcentaje = Math.round(battery.level * 100);
-                        document.getElementById('battery-status').innerText = `Porcentaje actual: ${porcentaje}%`;
+                        const statusTxt = document.getElementById('battery-status');
