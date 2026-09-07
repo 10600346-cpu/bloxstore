@@ -16,13 +16,10 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-image: url('https://imgur.com'); /* Fondo Windows 10 */
-            background-size: cover;
-            background-position: center;
-            background-color: #0078d7;
+            background: radial-gradient(circle at 80% 50%, #175e9b 0%, #002e62 70%);
         }
         
-        /* Contenedor del Escritorio */
+        /* Escritorio */
         #desktop {
             width: 100%;
             height: calc(100% - 40px);
@@ -30,7 +27,146 @@
             top: 0;
             left: 0;
             z-index: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: flex-start;
         }
+
+        .desktop-icon {
+            width: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            padding: 5px;
+            border: 1px solid transparent;
+            border-radius: 3px;
+        }
+        .desktop-icon:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .desktop-icon span.icon-img { font-size: 32px; margin-bottom: 5px; }
+        .desktop-icon span.icon-text { color: white; font-size: 11px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
+
+        /* Ventanas */
+        .window {
+            position: absolute;
+            top: 80px;
+            left: 120px;
+            width: 450px;
+            height: 300px;
+            background-color: #ffffff;
+            border: 1px solid #1c1c1c;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            display: none;
+            flex-direction: column;
+            z-index: 100;
+        }
+        .window-header {
+            background-color: #efefef;
+            height: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-left: 10px;
+            cursor: move;
+            border-bottom: 1px solid #d1d1d1;
+        }
+        .window-title { font-size: 12px; color: #333333; }
+        .window-controls { display: flex; height: 100%; }
+        .win-btn {
+            width: 45px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .win-btn:hover { background-color: #e5e5e5; }
+        .win-btn.close:hover { background-color: #e81123; color: white; }
+        .window-content { padding: 15px; flex: 1; font-size: 14px; color: #333; }
+
+        /* NUEVO MENÚ DE INICIO REAL DE WINDOWS 10 */
+        #start-menu {
+            position: absolute;
+            bottom: 40px;
+            left: 0;
+            width: 620px;
+            height: 500px;
+            background-color: rgba(25, 25, 25, 0.95);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+            z-index: 10000;
+            display: none;
+            grid-template-columns: 45px 225px 1fr;
+        }
+
+        /* Barra de opciones izquierda (Apagar, Config) */
+        .start-sidebar {
+            background-color: rgba(10, 10, 10, 0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 10px;
+            gap: 15px;
+        }
+        .sidebar-icon { color: #ccc; font-size: 18px; cursor: pointer; padding: 10px; width: 100%; text-align: center; }
+        .sidebar-icon:hover { background-color: rgba(255,255,255,0.1); color: white; }
+
+        /* Lista de aplicaciones del medio */
+        .start-apps-list {
+            padding: 15px 10px;
+            overflow-y: auto;
+            color: #ddd;
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .app-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+        .app-item:hover { background-color: rgba(255,255,255,0.1); }
+        .app-icon-small { font-size: 16px; }
+
+        /* Panel de mosaicos de la derecha (Tiles) */
+        .start-tiles-grid {
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-auto-rows: 90px;
+            gap: 8px;
+        }
+        .tile {
+            background-color: #0078d7;
+            color: white;
+            padding: 10px;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .tile:hover { transform: scale(0.98); filter: brightness(1.1); }
+        .tile.wide { grid-column: span 2; background-color: #d83b01; }
+        .tile.green { background-color: #107c41; }
+        .tile-icon { font-size: 24px; }
 
         /* Barra de tareas */
         #taskbar {
@@ -47,49 +183,16 @@
             z-index: 9999;
             border-top: 1px solid rgba(255,255,255,0.1);
         }
-        .start-btn {
-            width: 48px;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-        }
+        .start-btn { width: 48px; height: 100%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .start-btn:hover { background-color: rgba(255,255,255,0.1); }
         .start-btn svg { width: 16px; height: 16px; fill: white; }
         
-        /* Bandeja del sistema */
-        .system-tray {
-            display: flex;
-            align-items: center;
-            height: 100%;
-            padding-right: 10px;
-            color: white;
-            font-size: 12px;
-        }
-        .tray-icon {
-            padding: 0 12px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            position: relative;
-        }
+        .system-tray { display: flex; align-items: center; height: 100%; padding-right: 10px; color: white; font-size: 12px; }
+        .tray-icon { padding: 0 12px; height: 100%; display: flex; align-items: center; cursor: pointer; }
         .tray-icon:hover { background-color: rgba(255,255,255,0.1); }
-        
-        /* Reloj */
-        .clock-widget {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            justify-content: center;
-            padding: 0 10px;
-            height: 100%;
-            cursor: pointer;
-        }
+        .clock-widget { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; padding: 0 10px; height: 100%; cursor: pointer; }
         .clock-widget:hover { background-color: rgba(255,255,255,0.1); }
 
-        /* Submenús interactivos (Popovers) */
         .popover {
             position: absolute;
             bottom: 45px;
@@ -105,162 +208,64 @@
             box-shadow: 0 6px 15px rgba(0,0,0,0.6);
             z-index: 10000;
         }
-        .popover h4 { margin-bottom: 10px; font-size: 13px; border-bottom: 1px solid #444; padding-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .popover p { font-size: 12px; margin: 6px 0; }
-
-        /* Pantalla de carga inicial fija */
-        #boot-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #000000;
-            z-index: 100000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            transition: opacity 0.5s ease;
-        }
-        .spinner {
-            border: 3px solid rgba(255,255,255,0.1);
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            border-left-color: #ffffff;
-            animation: spin 1.2s linear infinite;
-            margin-top: 60px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <!-- Pantalla de Arranque (Boot) -->
-    <div id="boot-screen">
-        <svg width="100" height="100" viewBox="0 0 100 100" fill="#ffffff">
-            <path d="M0 12.2L43.4 6.2V46H0V12.2z M0 54h43.4v39.8L0 87.8V54z M50 5.3L100 0v46H50V5.3z M100 54v46L50 94.7V54H100z"/>
-        </svg>
-        <div class="spinner"></div>
-    </div>
-
-    <!-- Escritorio interactivo -->
-    <div id="desktop"></div>
-
-    <!-- Barra de tareas -->
-    <div id="taskbar">
-        <div class="start-btn" id="startBtn">
-            <svg viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.45H0V3.449zM0 12.45h9.75v9.45L0 20.551v-8.102zM10.95 1.95L24 0v11.55H10.95V1.95zM10.95 12.45H24v11.55l-13.05-1.95v-9.6z"/></svg>
+    <!-- Escritorio -->
+    <div id="desktop">
+        <div class="desktop-icon" ondblclick="openWindow('win-pc')" onclick="event.stopPropagation()">
+            <span class="icon-img">🖥️</span>
+            <span class="icon-text">Este Equipo</span>
         </div>
-
-        <div class="system-tray">
-            <!-- Icono Wi-Fi -->
-            <div class="tray-icon" onclick="togglePopover(event, 'wifi-popover')">
-                <span id="wifi-icon">📶</span>
-            </div>
-            <!-- Icono Batería -->
-            <div class="tray-icon" onclick="togglePopover(event, 'battery-popover')">
-                <span id="battery-icon">🔋</span>
-            </div>
-            <!-- Reloj / Fecha -->
-            <div class="clock-widget">
-                <span id="taskbar-time">00:00</span>
-                <span id="taskbar-date">01/01/2026</span>
-            </div>
+        <div class="desktop-icon" ondblclick="openWindow('win-notes')" onclick="event.stopPropagation()">
+            <span class="icon-img">📝</span>
+            <span class="icon-text">Notas Pro</span>
         </div>
     </div>
 
-    <!-- Popover de Wi-Fi -->
-    <div id="wifi-popover" class="popover">
-        <h4>Red e Internet</h4>
-        <p id="wifi-status">Detectando adaptador de red...</p>
+    <!-- Menú de Inicio Adaptado Real de la Imagen -->
+    <div id="start-menu" onclick="event.stopPropagation()">
+        <!-- Barra Lateral Izquierda -->
+        <div class="start-sidebar">
+            <div class="sidebar-icon" title="Usuario">👤</div>
+            <div class="sidebar-icon" title="Configuración">⚙️</div>
+            <div class="sidebar-icon" title="Apagar" onclick="location.reload()"> Telling ⚙️</div>
+        </div>
+
+        <!-- Lista Central de Aplicaciones -->
+        <div class="start-apps-list">
+            <div style="color: #666; font-size: 11px; font-weight: bold; padding-left: 5px;">Más usadas</div>
+            <div class="app-item" onclick="openWindow('win-pc'); toggleStartMenu(event)">
+                <span class="app-icon-small">🖥️</span> <span>Este Equipo</span>
+            </div>
+            <div class="app-item" onclick="openWindow('win-notes'); toggleStartMenu(event)">
+                <span class="app-icon-small">📝</span> <span>Notas Pro</span>
+            </div>
+            <div class="app-item"><span class="app-icon-small">🌐</span> <span>Microsoft Edge</span></div>
+            <div class="app-item"><span class="app-icon-small">📁</span> <span>Explorador de archivos</span></div>
+        </div>
+
+        <!-- Cuadrícula de Mosaicos de la Derecha (Tiles) -->
+        <div class="start-tiles-grid">
+            <div class="tile wide">
+                <span class="tile-icon">📅</span>
+                <span>Calendario de Outlook</span>
+            </div>
+            <div class="tile green">
+                <span class="tile-icon">🎮</span>
+                <span>Candy Crush</span>
+            </div>
+            <div class="tile">
+                <span class="tile-icon">☁️</span>
+                <span>El Tiempo - 24°C</span>
+            </div>
+            <div class="tile">
+                <span class="tile-icon">🛒</span>
+                <span>Microsoft Store</span>
+            </div>
+        </div>
     </div>
 
-    <!-- Popover de Batería -->
-    <div id="battery-popover" class="popover">
-        <h4>Batería y Sistema</h4>
-        <p id="battery-status">Sincronizando telemetría...</p>
-        <p id="battery-charging"></p>
-    </div>
-
-    <script>
-        // Remueve la pantalla de carga de forma segura a los 3 segundos
-        setTimeout(function() {
-            var bootScreen = document.getElementById('boot-screen');
-            if (bootScreen) {
-                bootScreen.style.opacity = '0';
-                setTimeout(function() {
-                    bootScreen.style.display = 'none';
-                }, 500);
-            }
-        }, 3000);
-
-        // Reloj del sistema corregido por completo
-        function actualizarReloj() {
-            var ahora = new Date();
-            var horas = ahora.getHours();
-            var minutos = ahora.getMinutes();
-            var dia = ahora.getDate();
-            var mes = ahora.getMonth() + 1;
-            var anio = ahora.getFullYear();
-
-            horas = horas < 10 ? '0' + horas : horas;
-            minutos = minutos < 10 ? '0' + minutos : minutos;
-            dia = dia < 10 ? '0' + dia : dia;
-            mes = mes < 10 ? '0' + mes : mes;
-
-            var timeEl = document.getElementById('taskbar-time');
-            var dateEl = document.getElementById('taskbar-date');
-            if (timeEl) timeEl.innerText = horas + ':' + minutos;
-            if (dateEl) dateEl.innerText = dia + '/' + mes + '/' + anio;
-        }
-        
-        actualizarReloj();
-        setInterval(actualizarReloj, 1000);
-
-        // Alternar paneles de Wi-Fi y Batería
-        function togglePopover(event, id) {
-            if (event) event.stopPropagation();
-            var popover = document.getElementById(id);
-            if (!popover) return;
-            
-            var estaAbierto = popover.style.display === 'block';
-            cerrarTodosLosPopovers();
-            
-            if (!estaAbierto) {
-                popover.style.display = 'block';
-            }
-        }
-
-        function cerrarTodosLosPopovers() {
-            var popovers = document.querySelectorAll('.popover');
-            for (var i = 0; i < popovers.length; i++) {
-                popovers[i].style.display = 'none';
-            }
-        }
-
-        document.getElementById('desktop').addEventListener('click', cerrarTodosLosPopovers);
-        document.getElementById('startBtn').addEventListener('click', function(e) {
-            e.stopPropagation();
-            alert("Menú de Inicio de Windows 10 Pro cargado.");
-        });
-
-        // Verificación básica del estado de red
-        function verificarConexion() {
-            var online = navigator.onLine;
-            var statusTxt = document.getElementById('wifi-status');
-            var icon = document.getElementById('wifi-icon');
-            if (statusTxt && icon) {
-                if (online) {
-                    statusTxt.innerText = "Conectado a Internet (Acceso Seguro Windows)";
-                    icon.innerText = "📶";
-                } else {
-                    statusTxt.innerText = "Desconectado - Sin acceso a la red";
-                    icon.innerText = "❌";
-                }
-            }
-        }
-        window.addEventListener('online', verificarConexion);
-        window.addEventListener('offline', verificarConexion);
-        verificarConexion();
-    </script>
-</body>
-</html>
+    <!-- Ventanas -->
+    <div id="win-pc" class="window" onclick="focusWindow('win-pc')">
