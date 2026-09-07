@@ -1794,3 +1794,155 @@ window.addEventListener(
 </body>
 </html>
 ```
+/* =========================================
+        COLISIÓN DEL JUGADOR - FIX
+========================================= */
+
+const PLAYER_HEIGHT = 1.8;
+const PLAYER_WIDTH = 0.6;
+const PLAYER_RADIUS = PLAYER_WIDTH / 2;
+
+
+/*
+    camera.position = cabeza
+
+    Los pies están 1.8 bloques debajo.
+*/
+function getPlayerBox(pos){
+
+    const feetY = pos.y - PLAYER_HEIGHT;
+
+    return {
+        minX: pos.x - PLAYER_RADIUS,
+        maxX: pos.x + PLAYER_RADIUS,
+
+        minY: feetY,
+        maxY: pos.y,
+
+        minZ: pos.z - PLAYER_RADIUS,
+        maxZ: pos.z + PLAYER_RADIUS
+    };
+
+}
+
+
+function playerCollides(pos){
+
+    const box = getPlayerBox(pos);
+
+    const minX = Math.floor(box.minX);
+    const maxX = Math.floor(box.maxX);
+
+    const minY = Math.floor(box.minY);
+    const maxY = Math.floor(box.maxY - 0.001);
+
+    const minZ = Math.floor(box.minZ);
+    const maxZ = Math.floor(box.maxZ);
+
+
+    for(let x=minX; x<=maxX; x++){
+
+        for(let y=minY; y<=maxY; y++){
+
+            for(let z=minZ; z<=maxZ; z++){
+
+                if(
+                    blocks.has(
+                        blockKey(x,y,z)
+                    )
+                ){
+
+                    return true;
+
+                }
+
+            }
+
+        }
+
+    }
+
+    return false;
+
+}
+
+
+/*
+    Movimiento con colisión por cada eje.
+*/
+function movePlayer(dx,dy,dz){
+
+    const p = controls.object.position;
+
+
+    /* =========================
+            X
+    ========================= */
+
+    if(dx !== 0){
+
+        const test = p.clone();
+
+        test.x += dx;
+
+        if(!playerCollides(test)){
+
+            p.x = test.x;
+
+        }
+
+    }
+
+
+    /* =========================
+            Z
+    ========================= */
+
+    if(dz !== 0){
+
+        const test = p.clone();
+
+        test.z += dz;
+
+        if(!playerCollides(test)){
+
+            p.z = test.z;
+
+        }
+
+    }
+
+
+    /* =========================
+            Y
+    ========================= */
+
+    if(dy !== 0){
+
+        const test = p.clone();
+
+        test.y += dy;
+
+
+        if(!playerCollides(test)){
+
+            p.y = test.y;
+
+            grounded = false;
+
+        }
+        else{
+
+            if(dy < 0){
+
+                grounded = true;
+
+            }
+
+            velocityY = 0;
+
+        }
+
+    }
+
+}
