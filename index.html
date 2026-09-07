@@ -2,65 +2,205 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mini Clon de Minecraft</title>
+    <title>Clon de Minecraft en JS</title>
     <style>
-        body { margin: 0; overflow: hidden; } /* Quita los bordes de la página */
-        canvas { display: block; }
+        body { margin: 0; overflow: hidden; background-color: #87CEEB; }
+        #bloqueador {
+            position: absolute; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            color: white; font-family: Arial, sans-serif; cursor: pointer;
+            z-index: 10;
+        }
+        #mira {
+            position: absolute; top: 50%; left: 50%;
+            width: 20px; height: 20px;
+            transform: translate(-50%, -50%);
+            pointer-events: none; z-index: 5;
+        }
+        /* Dibujando una cruz simple para la mira */
+        #mira::before, #mira::after {
+            content: ''; position: absolute; background: white;
+        }
+        #mira::before { top: 9px; left: 0; width: 20px; height: 2px; }
+        #mira::after { top: 0; left: 9px; width: 2px; height: 20px; }
     </style>
 </head>
 <body>
-    <!-- Importamos la librería Three.js para el 3D -->
+    <!-- Pantalla de inicio para capturar el ratón -->
+    <div id="bloqueador">
+        <h1>Haz clic para jugar</h1>
+        <p>WASD para moverte | Espacio para saltar | Clic Izquierdo: Romper | Clic Derecho: Poner</p>
+    </div>
+    <!-- La mira del centro -->
+    <div id="mira"></div>
+
+    <!-- Librerías de Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
+
     <script>
-        // 1. Configurar la escena y el cielo
+        // 1. Configuración Básica
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x87CEEB); // Color azul cielo
+        scene.background = new THREE.Color(0x87CEEB); // Cielo azul
+        scene.fog = new THREE.Fog(0x87CEEB, 20, 50); // Niebla para ocultar el límite del mundo
 
-        // 2. Configurar la cámara
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 5, 10); // Posición (x, y, z)
-        camera.lookAt(0, 0, 0); // Mirar hacia el centro
-
-        // 3. Configurar el renderizador
-        const renderer = new THREE.WebGLRenderer();
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // 4. Crear los bloques (Geometría y Material)
-        const blockGeometry = new THREE.BoxGeometry(1, 1, 1);
-        const blockMaterial = new THREE.MeshBasicMaterial({ color: 0x228B22 }); // Verde pasto
-        const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x000000 }); // Bordes negros
+        // 2. Luces (para que los bloques tengan sombras y volumen)
+        const luzAmbiente = new THREE.AmbientLight(0xcccccc, 0.6);
+        scene.add(luzAmbiente);
+        const luzDireccional = new THREE.DirectionalLight(0xffffff, 0.8);
+        luzDireccional.position.set(10, 20, 10);
+        scene.add(luzDireccional);
 
-        // 5. Generar un piso de 11x11 bloques
-        for (let x = -5; x <= 5; x++) {
-            for (let z = -5; z <= 5; z++) {
-                const block = new THREE.Mesh(blockGeometry, blockMaterial);
-                block.position.set(x, 0, z);
+        // 3. Controles en Primera Persona (PointerLock)
+        const controls = new THREE.PointerLockControls(camera, document.body);
+        const bloqueador = document.getElementById('bloqueador');
+
+        bloqueador.addEventListener('click', () => controls.lock());
+        controls.addEventListener('lock', () => bloqueador.style.display = 'none');
+        controls.addEventListener('unlock', () => bloqueador.style.display = 'flex');
+        scene.add(controls.getObject());
+
+        // 4. Materiales de los bloques (Colores simulando texturas)
+        const materialPasto = new THREE.MeshLambertMaterial({ color: 0x3b8526 }); // Verde
+        const materialTierra = new THREE.MeshLambertMaterial({ color: 0x5d4037 }); // Café
+        const geometriaBloque = new THREE.BoxGeometry(1, 1, 1);
+        
+        const objetosMundo = []; // Array para guardar los bloques con los que chocamos
+
+        // 5. Generación del Mundo (Terreno con colinas simples)
+        const tamanoMundo = 20;
+        for (let x = -tamanoMundo; x < tamanoMundo; x++) {
+            for (let z = -tamanoMundo; z < tamanoMundo; z++) {
+                // Generar altura aleatoria suave (colinas)
+                let altura = Math.floor(Math.sin(x / 5) * 2 + Math.cos(z / 5) * 2);
                 
-                // Agregar bordes para que se parezca más a Minecraft
-                const edges = new THREE.EdgesGeometry(blockGeometry);
-                const line = new THREE.LineSegments(edges, edgeMaterial);
-                block.add(line);
+                for (let y = -3; y <= altura; y++) {
+                    let material = (y === altura) ? materialPasto : materialTierra;
+                    const bloque = new THREE.Mesh(geometriaBloque, material);
+                    bloque.position.set(x, y, z);
+                    
+                    // Bordes negros estilo Minecraft clásico
+                    const bordes = new THREE.EdgesGeometry(geometriaBloque);
+                    const lineas = new THREE.LineSegments(bordes, new THREE.LineBasicMaterial({ color: 0x000000, opacity: 0.2, transparent: true }));
+                    bloque.add(lineas);
 
-                scene.add(block);
+                    scene.add(bloque);
+                    objetosMundo.push(bloque);
+                }
             }
         }
 
-        // 6. Hacer que la cámara gire lentamente para ver el mundo
-        function animate() {
-            requestAnimationFrame(animate);
-            camera.position.x = Math.sin(Date.now() * 0.001) * 10;
-            camera.position.z = Math.cos(Date.now() * 0.001) * 10;
-            camera.lookAt(0, 0, 0);
+        // Posición inicial del jugador
+        controls.getObject().position.set(0, 10, 0);
+
+        // 6. Lógica de Movimiento y Gravedad
+        let moverseAdelante = false, moverseAtras = false, moverseIzquierda = false, moverseDerecha = false;
+        let puedeSaltar = false;
+        const velocidad = new THREE.Vector3();
+        const direccion = new THREE.Vector3();
+        let tiempoAnterior = performance.now();
+
+        document.addEventListener('keydown', (event) => {
+            switch (event.code) {
+                case 'KeyW': moverseAdelante = true; break;
+                case 'KeyA': moverseIzquierda = true; break;
+                case 'KeyS': moverseAtras = true; break;
+                case 'KeyD': moverseDerecha = true; break;
+                case 'Space': if (puedeSaltar) velocidad.y += 10; puedeSaltar = false; break;
+            }
+        });
+        document.addEventListener('keyup', (event) => {
+            switch (event.code) {
+                case 'KeyW': moverseAdelante = false; break;
+                case 'KeyA': moverseIzquierda = false; break;
+                case 'KeyS': moverseAtras = false; break;
+                case 'KeyD': moverseDerecha = false; break;
+            }
+        });
+
+        // 7. Interacción: Romper y Poner Bloques
+        const raycaster = new THREE.Raycaster();
+        document.addEventListener('mousedown', (event) => {
+            if (!controls.isLocked) return;
+            
+            // Lanzar un rayo desde el centro de la pantalla
+            raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+            const intersecciones = raycaster.intersectObjects(objetosMundo);
+
+            if (intersecciones.length > 0) {
+                const intersectado = intersecciones[0];
+                // Límite de distancia para interactuar (alcance del brazo)
+                if (intersectado.distance > 5) return; 
+
+                if (event.button === 0) { // Clic izquierdo: Romper
+                    scene.remove(intersectado.object);
+                    objetosMundo.splice(objetosMundo.indexOf(intersectado.object), 1);
+                } else if (event.button === 2) { // Clic derecho: Poner
+                    const posicionNueva = intersectado.object.position.clone().add(intersectado.face.normal);
+                    const nuevoBloque = new THREE.Mesh(geometriaBloque, materialTierra);
+                    nuevoBloque.position.copy(posicionNueva);
+                    
+                    const bordes = new THREE.EdgesGeometry(geometriaBloque);
+                    const lineas = new THREE.LineSegments(bordes, new THREE.LineBasicMaterial({ color: 0x000000, opacity: 0.2, transparent: true }));
+                    nuevoBloque.add(lineas);
+
+                    scene.add(nuevoBloque);
+                    objetosMundo.push(nuevoBloque);
+                }
+            }
+        });
+
+        // 8. Bucle de Animación del Juego
+        function animar() {
+            requestAnimationFrame(animar);
+
+            const tiempoActual = performance.now();
+            if (controls.isLocked) {
+                const delta = (tiempoActual - tiempoAnterior) / 1000;
+
+                velocidad.x -= velocidad.x * 10.0 * delta;
+                velocidad.z -= velocidad.z * 10.0 * delta;
+                velocidad.y -= 30.0 * delta; // Gravedad 
+
+                direccion.z = Number(moverseAdelante) - Number(moverseAtras);
+                direccion.x = Number(moverseDerecha) - Number(moverseIzquierda);
+                direccion.normalize(); // Asegura movimiento consistente en diagonales
+
+                if (moverseAdelante || moverseAtras) velocidad.z -= direccion.z * 40.0 * delta;
+                if (moverseIzquierda || moverseDerecha) velocidad.x -= direccion.x * 40.0 * delta;
+
+                // Colisión simple con el piso
+                controls.moveRight(-velocidad.x * delta);
+                controls.moveForward(-velocidad.z * delta);
+                controls.getObject().position.y += (velocidad.y * delta);
+
+                // Evitar caer al infinito (Suelo base)
+                if (controls.getObject().position.y < 2) {
+                    velocidad.y = 0;
+                    controls.getObject().position.y = 2;
+                    puedeSaltar = true;
+                }
+            }
+            tiempoAnterior = tiempoActual;
             renderer.render(scene, camera);
         }
-        animate();
+        animar();
 
-        // 7. Ajustar si cambias el tamaño de la ventana
+        // Evitar el menú contextual al dar clic derecho
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // Ajustar pantalla al cambiar tamaño
         window.addEventListener('resize', () => {
-            renderer.setSize(window.innerWidth, window.innerHeight);
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
         });
     </script>
 </body>
