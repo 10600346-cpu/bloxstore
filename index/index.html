@@ -183,7 +183,7 @@
     </div>
 
     <script>
-        // Control de la pantalla de carga (Remueve el bloqueo)
+        // Control de la pantalla de carga (Ya no se queda bloqueado)
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const bootScreen = document.getElementById('boot-screen');
@@ -191,24 +191,24 @@
                 setTimeout(() => {
                     bootScreen.style.display = 'none';
                 }, 500);
-            }, 3000); // 3 segundos de carga inicial de Windows
+            }, 3000); // 3 segundos de carga inicial
             
             actualizarReloj();
             setInterval(actualizarReloj, 1000);
             inicializarHardware();
         });
 
-        // Actualización en tiempo real del reloj del sistema
+        // Actualización del reloj del sistema (Bug solucionado aquí)
         function actualizarReloj() {
             const ahora = new Date();
             let horas = ahora.getHours();
             let minutos = ahora.getMinutes();
             let dia = ahora.getDate();
-            let mes = ahora.getMonth() + 1;
+            let mes = now = ahora.getMonth() + 1;
             let anio = ahora.getFullYear();
 
             horas = horas < 10 ? '0' + horas : horas;
-            minutos = minutos < 10 ? '0' + minutos : minutes;
+            minutos = minutos < 10 ? '0' + minutos : minutos; // Corregido 'minutes' a 'minutos'
             dia = dia < 10 ? '0' + dia : dia;
             mes = mes < 10 ? '0' + mes : mes;
 
@@ -216,13 +216,12 @@
             document.getElementById('taskbar-date').innerText = `${dia}/${mes}/${anio}`;
         }
 
-        // Alternar menús emergentes de forma limpia
+        // Alternar menús emergentes de la barra de tareas
         function togglePopover(event, id) {
             if (event) event.stopPropagation();
             const popover = document.getElementById(id);
             const estaAbierto = popover.style.display === 'block';
             
-            // Corrige el fallo anterior cerrando los menús adecuadamente
             cerrarTodosLosPopovers();
             
             if (!estaAbierto) {
@@ -236,16 +235,16 @@
             });
         }
 
-        // Cierra los menús al hacer clic directamente en el papel tapiz
+        // Acciones al pulsar en el escritorio o menú inicio
         document.getElementById('desktop').addEventListener('click', cerrarTodosLosPopovers);
         document.getElementById('startBtn').addEventListener('click', (e) => {
             e.stopPropagation();
-            alert("Menú de Inicio Windows 10 Pro Proactivo configurado.");
+            alert("Menú de Inicio Windows 10 Pro cargado correctamente.");
         });
 
-        // Lectores de Hardware en tiempo real (Wi-Fi y Batería nativa)
+        // Telemetría nativa de Hardware (Wi-Fi y Batería de Laptop)
         function inicializarHardware() {
-            // Wi-Fi Real del navegador
+            // Monitor de red Wi-Fi
             function verificarConexion() {
                 const online = navigator.onLine;
                 const statusTxt = document.getElementById('wifi-status');
@@ -256,14 +255,14 @@
                     icon.innerText = "📶";
                 } else {
                     statusTxt.innerText = "Desconectado - Sin acceso a la red";
-                    icon.innerText = "🌐❌";
+                    icon.innerText = "❌";
                 }
             }
             window.addEventListener('online', verificarConexion);
             window.addEventListener('offline', verificarConexion);
             verificarConexion();
 
-            // Telemetría de Batería Real
+            // Medidor de batería real
             if ('getBattery' in navigator) {
                 navigator.getBattery().then(function(battery) {
                     function updateBatteryInfo() {
