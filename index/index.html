@@ -53,7 +53,7 @@
         .desktop-icon span.icon-img { font-size: 32px; margin-bottom: 5px; }
         .desktop-icon span.icon-text { color: white; font-size: 11px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
 
-        /* MENÚ DE INICIO REAL DE WINDOWS 10 (Estilo mosaico) */
+        /* MENÚ DE INICIO REAL DE WINDOWS 10 (Estilo Mosaico) */
         #start-menu {
             position: absolute;
             bottom: 40px;
@@ -66,11 +66,11 @@
             border-right: 1px solid rgba(255,255,255,0.1);
             box-shadow: 5px 0 15px rgba(0,0,0,0.5);
             z-index: 10000;
-            display: none; /* Oculto al inicio */
+            display: none; 
             grid-template-columns: 45px 225px 1fr;
         }
 
-        /* Columna izquierda (Apagar, Config) */
+        /* Columna izquierda de iconos mínimos */
         .start-sidebar {
             background-color: rgba(10, 10, 10, 0.4);
             display: flex;
@@ -83,7 +83,7 @@
         .sidebar-icon { color: #ccc; font-size: 18px; cursor: pointer; padding: 10px; width: 100%; text-align: center; }
         .sidebar-icon:hover { background-color: rgba(255,255,255,0.1); color: white; }
 
-        /* Lista central de aplicaciones */
+        /* Lista central de programas */
         .start-apps-list {
             padding: 15px 10px;
             overflow-y: auto;
@@ -103,7 +103,7 @@
         }
         .app-item:hover { background-color: rgba(255,255,255,0.1); }
 
-        /* Cuadrícula de paneles (Tiles) de la derecha */
+        /* Paneles de Mosaicos de la Derecha (Tiles de Windows 10) */
         .start-tiles-grid {
             padding: 15px;
             background-color: rgba(0, 0, 0, 0.1);
@@ -128,7 +128,7 @@
         .tile.green { background-color: #107c41; }
         .tile-icon { font-size: 24px; }
 
-        /* Ventanas */
+        /* Ventanas Interactivas */
         .window {
             position: absolute;
             top: 80px;
@@ -157,7 +157,7 @@
         .win-btn:hover { background-color: #e5e5e5; }
         .window-content { padding: 15px; flex: 1; font-size: 14px; color: #333; }
 
-        /* Barra de tareas */
+        /* Barra de tareas inferior */
         #taskbar {
             position: absolute;
             bottom: 0;
@@ -177,57 +177,42 @@
         .start-btn svg { width: 16px; height: 16px; fill: white; }
         
         .system-tray { display: flex; align-items: center; height: 100%; padding-right: 10px; color: white; font-size: 12px; }
-        .tray-icon { padding: 0 12px; height: 100%; display: flex; align-items: center; cursor: pointer; }
-        .tray-icon:hover { background-color: rgba(255,255,255,0.1); }
-        .clock-widget { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; padding: 0 10px; height: 100%; cursor: pointer; }
-
-        .popover {
-            position: absolute;
-            bottom: 45px;
-            right: 10px;
-            background: rgba(28, 28, 28, 0.95);
-            border: 1px solid rgba(255,255,255,0.15);
-            color: white;
-            padding: 15px;
-            display: none;
-            width: 290px;
-            z-index: 10000;
-        }
+        .clock-widget { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; padding: 0 10px; height: 100%; }
     </style>
 </head>
 <body>
 
     <!-- Escritorio -->
     <div id="desktop">
-        <div class="desktop-icon" ondblclick="openWindow('win-pc')" onclick="event.stopPropagation()">
+        <div class="desktop-icon" ondblclick="ejecutarVentana('win-pc')" onclick="event.stopPropagation()">
             <span class="icon-img">🖥️</span>
             <span class="icon-text">Este Equipo</span>
         </div>
-        <div class="desktop-icon" ondblclick="openWindow('win-notes')" onclick="event.stopPropagation()">
+        <div class="desktop-icon" ondblclick="ejecutarVentana('win-notes')" onclick="event.stopPropagation()">
             <span class="icon-img">📝</span>
             <span class="icon-text">Notas Pro</span>
         </div>
     </div>
 
-    <!-- El Menú de Inicio Reconstruído sin Alertas de Texto -->
+    <!-- Menú de Inicio de Mosaicos Reales (Sin Alertas JavaScript) -->
     <div id="start-menu" onclick="event.stopPropagation()">
-        <!-- Barra de Configuración lateral -->
+        <!-- Barra de opciones -->
         <div class="start-sidebar">
             <div class="sidebar-icon">👤</div>
             <div class="sidebar-icon">⚙️</div>
             <div class="sidebar-icon" onclick="location.reload()">🔄</div>
         </div>
 
-        <!-- Lista Central de Programas -->
+        <!-- Lista Central de Apps -->
         <div class="start-apps-list">
             <div style="color: #888; font-size: 11px; font-weight: bold; padding: 0 5px 5px 5px;">Más usadas</div>
-            <div class="app-item" onclick="openWindow('win-pc'); cerrarTodo();"><span>🖥️ Este Equipo</span></div>
-            <div class="app-item" onclick="openWindow('win-notes'); cerrarTodo();"><span>📝 Notas Pro</span></div>
+            <div class="app-item" onclick="ejecutarVentana('win-pc'); limpiarEscritorio();"><span>🖥️ Este Equipo</span></div>
+            <div class="app-item" onclick="ejecutarVentana('win-notes'); limpiarEscritorio();"><span>📝 Notas Pro</span></div>
             <div class="app-item"><span>🌐 Google Chrome</span></div>
-            <div class="app-item"><span>📁 Explorador</span></div>
+            <div class="app-item"><span>📁 Explorador de archivos</span></div>
         </div>
 
-        <!-- Mosaicos de la derecha de la Imagen -->
+        <!-- Cuadrícula de Mosaicos Gráficos -->
         <div class="start-tiles-grid">
             <div class="tile wide">
                 <span class="tile-icon">📅</span>
@@ -248,17 +233,25 @@
         </div>
     </div>
 
-    <!-- Ventanas -->
-    <div id="win-pc" class="window" onclick="focusWindow('win-pc')">
-        <div class="window-header" onmousedown="dragStart(event, 'win-pc')">
+    <!-- Ventanas del Sistema -->
+    <div id="win-pc" class="window" onclick="enfocarVentana('win-pc')">
+        <div class="window-header" onmousedown="iniciarArrastre(event, 'win-pc')">
             <span style="font-size: 12px; color: #333;">Este Equipo</span>
-            <div class="window-controls"><div class="win-btn" onclick="closeWindow('win-pc')">✕</div></div>
+            <div class="window-controls"><div class="win-btn" onclick="cerrarVentana('win-pc')">✕</div></div>
         </div>
-        <div class="window-content"><p>🔵 Disco Local (C:) - 142 GB libres</p></div>
+        <div class="window-content"><p>🔵 Disco Local (C:) - Simulación activa</p></div>
     </div>
 
-    <div id="win-notes" class="window" onclick="focusWindow('win-notes')">
-        <div class="window-header" onmousedown="dragStart(event, 'win-notes')">
+    <div id="win-notes" class="window" onclick="enfocarVentana('win-notes')">
+        <div class="window-header" onmousedown="iniciarArrastre(event, 'win-notes')">
             <span style="font-size: 12px; color: #333;">Bloc de notas</span>
-            <div class="window-controls"><div class="win-btn" onclick="closeWindow('win-notes')">✕</div></div>
+            <div class="window-controls"><div class="win-btn" onclick="cerrarVentana('win-notes')">✕</div></div>
+        </div>
+        <div class="window-content" style="padding:0;"><textarea style="width:100%; height:100%; border:none; padding:10px; resize:none;"></textarea></div>
+    </div>
+
+    <!-- Barra de tareas -->
+    <div id="taskbar">
+        <div class="start-btn" id="startBtn" onclick="conmutarMenuInicio(event)">
+            <svg viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.45H0V3.449zM0 12.45h9.75v9.45L0 20.551v-8.102zM10.95 1.95L24 0v11.55H10.95V1.95zM10.95 12.45H24v11.55l-13.05-1.95v-9.6z"/></svg>
         </div>
