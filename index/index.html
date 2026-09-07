@@ -1,1660 +1,1228 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>VoxelCraft</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Windows 10 Pro</title>
 
 <style>
-html,body{
-    margin:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#87ceeb;
-    font-family:Arial,sans-serif;
+* {
+    box-sizing: border-box;
+    user-select: none;
 }
 
-canvas{
-    display:block;
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: "Segoe UI", Arial, sans-serif;
 }
 
-#menu,#death{
-    position:fixed;
-    inset:0;
-    z-index:100;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:rgba(0,0,0,.75);
-    color:white;
+body {
+    background:
+        radial-gradient(circle at 50% 45%, rgba(35,120,180,.55), transparent 35%),
+        linear-gradient(135deg, #07182d, #123b63 50%, #061526);
+    color: white;
 }
 
-#death{
-    display:none;
+/* ESCRITORIO */
+.desktop {
+    position: absolute;
+    inset: 0 0 48px 0;
 }
 
-.panel{
-    background:#222;
-    padding:35px;
-    border-radius:15px;
-    text-align:center;
-    box-shadow:0 0 30px #000;
+/* ICONOS */
+.icon {
+    position: absolute;
+    width: 90px;
+    text-align: center;
+    padding: 8px 4px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-radius: 3px;
 }
 
-.panel h1{
-    font-size:42px;
-    margin:0 0 20px;
+.icon:hover {
+    background: rgba(255,255,255,.12);
+    border-color: rgba(255,255,255,.15);
 }
 
-button{
-    padding:14px 40px;
-    border:0;
-    border-radius:8px;
-    background:#4caf3a;
-    color:white;
-    font-size:20px;
-    font-weight:bold;
-    cursor:pointer;
+.icon-img {
+    font-size: 38px;
+    height: 45px;
 }
 
-#hud{
-    position:fixed;
-    inset:0;
-    pointer-events:none;
-    z-index:10;
+.icon span {
+    display: block;
+    font-size: 12px;
+    text-shadow: 1px 1px 3px black;
 }
 
-#status{
-    position:absolute;
-    top:10px;
-    left:10px;
-    padding:8px 12px;
-    background:rgba(0,0,0,.5);
-    border-radius:8px;
-    color:white;
-    font-size:20px;
-    text-shadow:1px 1px 3px black;
+/* POSICIONES */
+#pc {
+    left: 15px;
+    top: 15px;
 }
 
-#crosshair{
-    position:absolute;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
-    color:white;
-    font-size:25px;
-    text-shadow:0 0 4px black;
+#trash {
+    left: 15px;
+    top: 105px;
 }
 
-#hotbar{
-    position:absolute;
-    bottom:15px;
-    left:50%;
-    transform:translateX(-50%);
-    display:flex;
-    gap:4px;
+#browser {
+    left: 15px;
+    top: 195px;
 }
 
-.slot{
-    width:48px;
-    height:48px;
-    background:rgba(0,0,0,.7);
-    border:2px solid #555;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:white;
-    position:relative;
+/* BARRA DE TAREAS */
+.taskbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 48px;
+    background: rgba(20,20,20,.96);
+    display: flex;
+    align-items: center;
+    z-index: 9999;
+    box-shadow: 0 -1px 5px rgba(0,0,0,.5);
 }
 
-.slot.selected{
-    border:3px solid white;
+.start-button {
+    width: 50px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 25px;
+    cursor: pointer;
 }
 
-.blockIcon{
-    width:30px;
-    height:30px;
-    background:#8b5a2b;
+.start-button:hover {
+    background: #333;
 }
 
-.num{
-    position:absolute;
-    right:3px;
-    bottom:1px;
-    font-size:12px;
+.search {
+    width: 250px;
+    height: 34px;
+    margin-left: 4px;
+    background: #fff;
+    color: #444;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    cursor: text;
+}
+
+.search input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 14px;
+}
+
+.task-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 23px;
+    cursor: pointer;
+}
+
+.task-icon:hover {
+    background: rgba(255,255,255,.12);
+}
+
+.clock {
+    margin-left: auto;
+    height: 48px;
+    padding: 0 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    font-size: 12px;
+}
+
+.clock:hover {
+    background: rgba(255,255,255,.1);
+}
+
+/* MENU INICIO */
+.start-menu {
+    position: fixed;
+    left: 0;
+    bottom: 48px;
+    width: 520px;
+    height: 610px;
+    max-height: calc(100vh - 48px);
+    background: rgba(25,25,25,.98);
+    box-shadow: 0 0 25px rgba(0,0,0,.6);
+    display: none;
+    z-index: 9998;
+}
+
+.start-menu.show {
+    display: flex;
+}
+
+.start-left {
+    width: 52px;
+    background: #191919;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 8px;
+}
+
+.start-left div {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.start-left div:hover {
+    background: #333;
+}
+
+.start-content {
+    flex: 1;
+    padding: 20px;
+    overflow: auto;
+}
+
+.start-title {
+    font-size: 21px;
+    margin-bottom: 15px;
+}
+
+.tile-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+}
+
+.tile {
+    height: 105px;
+    background: #1976b8;
+    padding: 12px;
+    cursor: pointer;
+    transition: .15s;
+}
+
+.tile:hover {
+    transform: scale(1.02);
+    filter: brightness(1.15);
+}
+
+.tile.big {
+    grid-column: span 2;
+}
+
+.tile-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.tile-text {
+    font-size: 13px;
+}
+
+/* VENTANAS */
+.window {
+    position: absolute;
+    left: 220px;
+    top: 80px;
+    width: 760px;
+    height: 500px;
+    background: #f4f4f4;
+    color: #222;
+    border: 1px solid #777;
+    box-shadow: 0 8px 30px rgba(0,0,0,.55);
+    display: none;
+    z-index: 100;
+}
+
+.window.active {
+    display: block;
+}
+
+.titlebar {
+    height: 38px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    padding-left: 12px;
+    cursor: move;
+}
+
+.titlebar-title {
+    flex: 1;
+    font-size: 13px;
+}
+
+.window-controls {
+    display: flex;
+    height: 38px;
+}
+
+.window-controls button {
+    width: 46px;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.window-controls button:hover {
+    background: #ddd;
+}
+
+.window-controls .close:hover {
+    background: #e81123;
+    color: white;
+}
+
+.window-body {
+    height: calc(100% - 38px);
+    overflow: auto;
+}
+
+/* EXPLORADOR */
+.explorer-toolbar {
+    height: 50px;
+    background: #f7f7f7;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 12px;
+}
+
+.explorer-toolbar input {
+    flex: 1;
+    height: 30px;
+    border: 1px solid #aaa;
+    padding: 5px 10px;
+}
+
+.explorer {
+    display: flex;
+    height: calc(100% - 50px);
+}
+
+.sidebar {
+    width: 190px;
+    border-right: 1px solid #ddd;
+    padding-top: 10px;
+}
+
+.side-item {
+    padding: 9px 20px;
+    cursor: pointer;
+}
+
+.side-item:hover {
+    background: #e5f1fb;
+}
+
+.files {
+    flex: 1;
+    padding: 20px;
+}
+
+.file-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 110px);
+    gap: 25px;
+}
+
+.file {
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.file:hover {
+    background: #dceeff;
+}
+
+.file-icon {
+    font-size: 43px;
+    margin-bottom: 5px;
+}
+
+/* CONFIGURACIÓN */
+.settings {
+    display: flex;
+    height: 100%;
+}
+
+.settings-sidebar {
+    width: 220px;
+    background: #f5f5f5;
+    border-right: 1px solid #ddd;
+    padding: 25px 0;
+}
+
+.settings-sidebar h2 {
+    padding: 0 25px;
+    font-weight: 400;
+}
+
+.setting-item {
+    padding: 12px 25px;
+    cursor: pointer;
+}
+
+.setting-item:hover {
+    background: #ddd;
+}
+
+.settings-main {
+    flex: 1;
+    padding: 35px;
+}
+
+.settings-main h1 {
+    font-size: 30px;
+    font-weight: 400;
+}
+
+.setting-card {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-top: 15px;
+    background: white;
+}
+
+/* MENÚ CONTEXTUAL */
+.context {
+    position: fixed;
+    width: 210px;
+    background: white;
+    color: #222;
+    box-shadow: 0 4px 15px rgba(0,0,0,.5);
+    display: none;
+    z-index: 20000;
+    padding: 5px 0;
+}
+
+.context div {
+    padding: 9px 18px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.context div:hover {
+    background: #e5f1fb;
+}
+
+/* NOTIFICACIÓN */
+.notification {
+    position: fixed;
+    right: 18px;
+    bottom: 65px;
+    width: 330px;
+    background: rgba(35,35,35,.96);
+    color: white;
+    padding: 18px;
+    box-shadow: 0 3px 15px black;
+    display: none;
+    z-index: 30000;
+}
+
+.notification.show {
+    display: block;
+}
+
+/* APAGADO */
+.power-menu {
+    position: fixed;
+    right: 10px;
+    bottom: 55px;
+    width: 180px;
+    background: #222;
+    display: none;
+    z-index: 20000;
+    box-shadow: 0 0 15px black;
+}
+
+.power-menu div {
+    padding: 14px;
+    cursor: pointer;
+}
+
+.power-menu div:hover {
+    background: #444;
+}
+
+/* PANTALLA NEGRA */
+.shutdown {
+    position: fixed;
+    inset: 0;
+    background: black;
+    color: white;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 999999;
+}
+
+.shutdown.show {
+    display: flex;
+}
+
+.spinner {
+    width: 45px;
+    height: 45px;
+    border: 4px solid #555;
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 25px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* RESPONSIVE */
+@media(max-width:800px) {
+    .window {
+        left: 2%;
+        top: 40px;
+        width: 96%;
+        height: calc(100% - 100px);
+    }
+
+    .search {
+        width: 170px;
+    }
+
+    .start-menu {
+        width: 100%;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<div id="menu">
-    <div class="panel">
-        <h1>🌍 VoxelCraft</h1>
-        <p>WASD — Mover</p>
-        <p>Mouse — Mirar</p>
-        <p>ESPACIO — Saltar</p>
-        <p>Click izquierdo — Romper</p>
-        <p>Click derecho — Colocar</p>
-        <p>1 — Bloque de tierra</p>
-        <br>
-        <button id="play">JUGAR</button>
+<div class="desktop" id="desktop">
+
+    <div class="icon" id="pc" ondblclick="openWindow('explorer')">
+        <div class="icon-img">💻</div>
+        <span>Este equipo</span>
+    </div>
+
+    <div class="icon" id="trash" ondblclick="openTrash()">
+        <div class="icon-img">🗑️</div>
+        <span>Papelera de reciclaje</span>
+    </div>
+
+    <div class="icon" id="browser" ondblclick="openBrowser()">
+        <div class="icon-img">🌐</div>
+        <span>Internet</span>
+    </div>
+
+</div>
+
+
+<!-- EXPLORADOR -->
+<div class="window" id="explorer">
+
+    <div class="titlebar">
+        <div class="titlebar-title">📁 Explorador de archivos</div>
+
+        <div class="window-controls">
+            <button onclick="minimize('explorer')">—</button>
+            <button onclick="maximize('explorer')">□</button>
+            <button class="close" onclick="closeWindow('explorer')">✕</button>
+        </div>
+    </div>
+
+    <div class="window-body">
+
+        <div class="explorer-toolbar">
+            <button>←</button>
+            <button>→</button>
+            <input placeholder="Buscar en Este equipo">
+        </div>
+
+        <div class="explorer">
+
+            <div class="sidebar">
+                <div class="side-item">🏠 Acceso rápido</div>
+                <div class="side-item">🖥️ Escritorio</div>
+                <div class="side-item">📥 Descargas</div>
+                <div class="side-item">📄 Documentos</div>
+                <div class="side-item">🖼️ Imágenes</div>
+                <div class="side-item">🎵 Música</div>
+                <div class="side-item">💾 Este equipo</div>
+            </div>
+
+            <div class="files">
+
+                <h3>Este equipo</h3>
+
+                <div class="file-grid">
+
+                    <div class="file">
+                        <div class="file-icon">📁</div>
+                        <div>Documentos</div>
+                    </div>
+
+                    <div class="file">
+                        <div class="file-icon">📁</div>
+                        <div>Descargas</div>
+                    </div>
+
+                    <div class="file">
+                        <div class="file-icon">📁</div>
+                        <div>Imágenes</div>
+                    </div>
+
+                    <div class="file">
+                        <div class="file-icon">📁</div>
+                        <div>Vídeos</div>
+                    </div>
+
+                    <div class="file">
+                        <div class="file-icon">💾</div>
+                        <div>Disco local (C:)</div>
+                    </div>
+
+                    <div class="file">
+                        <div class="file-icon">💿</div>
+                        <div>DVD RW</div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
     </div>
 </div>
 
-<div id="death">
-    <div class="panel">
-        <h1>💀 MORISTE</h1>
-        <p id="reason">Te quedaste sin comida.</p>
-        <button id="respawn">REAPARECER</button>
+
+<!-- CONFIGURACIÓN -->
+<div class="window" id="settings">
+
+    <div class="titlebar">
+        <div class="titlebar-title">⚙️ Configuración</div>
+
+        <div class="window-controls">
+            <button onclick="minimize('settings')">—</button>
+            <button onclick="maximize('settings')">□</button>
+            <button class="close" onclick="closeWindow('settings')">✕</button>
+        </div>
+    </div>
+
+    <div class="window-body">
+
+        <div class="settings">
+
+            <div class="settings-sidebar">
+
+                <h2>Configuración</h2>
+
+                <div class="setting-item">🖥️ Sistema</div>
+                <div class="setting-item">📱 Dispositivos</div>
+                <div class="setting-item">🌐 Red e Internet</div>
+                <div class="setting-item">🎨 Personalización</div>
+                <div class="setting-item">👤 Cuentas</div>
+                <div class="setting-item">🔒 Privacidad</div>
+                <div class="setting-item">🔄 Actualización</div>
+
+            </div>
+
+            <div class="settings-main">
+
+                <h1>Sistema</h1>
+
+                <div class="setting-card">
+                    <h3>Pantalla</h3>
+                    <p>Brillo, color, escala y resolución de pantalla.</p>
+                </div>
+
+                <div class="setting-card">
+                    <h3>Sonido</h3>
+                    <p>Administrar dispositivos de salida y volumen.</p>
+                </div>
+
+                <div class="setting-card">
+                    <h3>Acerca de</h3>
+                    <p>Windows 10 Pro — Sistema simulado.</p>
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 </div>
 
-<div id="hud">
-    <div id="status">
-        <div id="health">❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️</div>
-        <div id="food">🍗🍗🍗🍗🍗🍗🍗🍗🍗🍗</div>
-        <div id="coords">0 0 0</div>
+
+<!-- NAVEGADOR -->
+<div class="window" id="browserWindow">
+
+    <div class="titlebar">
+        <div class="titlebar-title">🌐 Navegador</div>
+
+        <div class="window-controls">
+            <button onclick="minimize('browserWindow')">—</button>
+            <button onclick="maximize('browserWindow')">□</button>
+            <button class="close" onclick="closeWindow('browserWindow')">✕</button>
+        </div>
     </div>
 
-    <div id="crosshair">+</div>
-    <div id="hotbar"></div>
+    <div class="window-body">
+
+        <div style="padding:15px;background:#eee;">
+            <input
+                id="browserUrl"
+                style="width:80%;padding:10px;border:1px solid #aaa;"
+                placeholder="Escribe una dirección..."
+            >
+            <button onclick="goBrowser()">Ir</button>
+        </div>
+
+        <div id="browserPage"
+             style="padding:50px;text-align:center;">
+            <h1>🌐 Navegador</h1>
+            <p>Escribe una dirección para continuar.</p>
+        </div>
+
+    </div>
 </div>
 
-<script type="importmap">
-{
-    "imports":{
-        "three":"https://cdn.jsdelivr.net/npm/three@0.177.0/build/three.module.js",
-        "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.177.0/examples/jsm/"
-    }
-}
-</script>
 
-<script type="module">
+<!-- PAPELERA -->
+<div class="window" id="trashWindow">
 
-import * as THREE from "three";
+    <div class="titlebar">
+        <div class="titlebar-title">🗑️ Papelera de reciclaje</div>
 
-import {
-    PointerLockControls
-} from "three/addons/controls/PointerLockControls.js";
+        <div class="window-controls">
+            <button onclick="minimize('trashWindow')">—</button>
+            <button onclick="maximize('trashWindow')">□</button>
+            <button class="close" onclick="closeWindow('trashWindow')">✕</button>
+        </div>
+    </div>
 
+    <div class="window-body"
+         style="padding:40px;text-align:center;">
 
-/* =====================================================
-                    ESCENA
-===================================================== */
+        <div style="font-size:70px;">🗑️</div>
 
-const scene = new THREE.Scene();
+        <h2>La Papelera está vacía</h2>
 
-scene.background =
-    new THREE.Color(0x87ceeb);
+        <p>No hay elementos en la Papelera de reciclaje.</p>
 
-scene.fog =
-    new THREE.Fog(
-        0x87ceeb,
-        25,
-        100
-    );
+    </div>
+</div>
 
 
-/* =====================================================
-                    CÁMARA
-===================================================== */
+<!-- MENU INICIO -->
+<div class="start-menu" id="startMenu">
 
-const camera =
-    new THREE.PerspectiveCamera(
-        75,
-        window.innerWidth /
-        window.innerHeight,
-        0.05,
-        150
-    );
+    <div class="start-left">
 
-camera.position.set(
-    0,
-    3,
-    8
-);
+        <div title="Usuario">👤</div>
+        <div title="Documentos" onclick="openWindow('explorer')">📁</div>
+        <div title="Configuración" onclick="openWindow('settings')">⚙️</div>
+        <div title="Apagar" onclick="togglePower()">⏻</div>
 
+    </div>
 
-/* =====================================================
-                   RENDERIZADO
-===================================================== */
+    <div class="start-content">
 
-const renderer =
-    new THREE.WebGLRenderer({
-        antialias:false
-    });
+        <div class="start-title">Inicio</div>
 
-renderer.setSize(
-    window.innerWidth,
-    window.innerHeight
-);
+        <div class="tile-grid">
 
-renderer.setPixelRatio(
-    Math.min(
-        window.devicePixelRatio,
-        2
-    )
-);
+            <div class="tile big" onclick="openWindow('explorer')">
+                <div class="tile-icon">📁</div>
+                <div class="tile-text">Explorador de archivos</div>
+            </div>
 
-renderer.shadowMap.enabled = true;
+            <div class="tile" onclick="openWindow('settings')">
+                <div class="tile-icon">⚙️</div>
+                <div class="tile-text">Configuración</div>
+            </div>
 
-document.body.appendChild(
-    renderer.domElement
-);
+            <div class="tile">
+                <div class="tile-icon">🌐</div>
+                <div class="tile-text">Internet</div>
+            </div>
 
+            <div class="tile">
+                <div class="tile-icon">🎮</div>
+                <div class="tile-text">Juegos</div>
+            </div>
 
-/* =====================================================
-                       LUZ
-===================================================== */
+            <div class="tile big">
+                <div class="tile-icon">🖼️</div>
+                <div class="tile-text">Fotos</div>
+            </div>
 
-const light =
-    new THREE.HemisphereLight(
-        0xffffff,
-        0x555555,
-        2
-    );
+            <div class="tile">
+                <div class="tile-icon">📝</div>
+                <div class="tile-text">Notas</div>
+            </div>
 
-scene.add(light);
+        </div>
+
+    </div>
+
+</div>
 
 
-const sun =
-    new THREE.DirectionalLight(
-        0xffffff,
-        2
-    );
+<!-- MENÚ CONTEXTUAL -->
+<div class="context" id="contextMenu">
 
-sun.position.set(
-    30,
-    50,
-    20
-);
+    <div onclick="location.reload()">🔄 Actualizar</div>
+    <div onclick="openWindow('explorer')">📁 Abrir</div>
+    <div onclick="openWindow('settings')">⚙️ Personalizar</div>
+    <div>📋 Configuración de pantalla</div>
 
-sun.castShadow = true;
-
-scene.add(sun);
+</div>
 
 
-/* =====================================================
-                CONTROLES DE CÁMARA
-===================================================== */
+<!-- POWER -->
+<div class="power-menu" id="powerMenu">
 
-const controls =
-    new PointerLockControls(
-        camera,
-        document.body
-    );
+    <div onclick="shutdown()">⏻ Apagar</div>
+    <div onclick="restart()">🔄 Reiniciar</div>
+    <div onclick="hidePower()">❌ Cancelar</div>
 
-
-/* =====================================================
-                     BLOQUES
-===================================================== */
-
-/*
-    IMPORTANTE:
-
-    Ahora SOLO existe un tipo de bloque:
-    TIERRA.
-
-    No hay bloques verdes.
-*/
-
-const dirtMaterial =
-    new THREE.MeshLambertMaterial({
-        color:0x8b5a2b
-    });
+</div>
 
 
-const blockGeometry =
-    new THREE.BoxGeometry(
-        1,
-        1,
-        1
-    );
+<!-- NOTIFICACIÓN -->
+<div class="notification" id="notification">
+
+    <b>Windows</b>
+
+    <p id="notificationText">
+        Esta es una notificación de prueba.
+    </p>
+
+</div>
 
 
-const blocks =
-    new Map();
+<!-- PANTALLA APAGADO -->
+<div class="shutdown" id="shutdownScreen">
 
-const meshes =
-    new Map();
+    <div class="spinner"></div>
 
+    <div>Apagando...</div>
 
-function blockKey(x,y,z){
-
-    return x + "," + y + "," + z;
-
-}
+</div>
 
 
-function createBlock(
-    x,
-    y,
-    z
-){
+<!-- BARRA -->
+<div class="taskbar">
 
-    const key =
-        blockKey(x,y,z);
+    <div class="start-button" onclick="toggleStart()">⊞</div>
 
-    if(
-        blocks.has(key)
-    ){
-        return;
-    }
+    <div class="search">
+        🔍
+        <input
+            id="searchInput"
+            placeholder="Escribe aquí para buscar"
+            onkeydown="searchKey(event)"
+        >
+    </div>
 
-    blocks.set(
-        key,
-        "dirt"
-    );
+    <div class="task-icon" onclick="openWindow('explorer')">
+        📁
+    </div>
 
-    const mesh =
-        new THREE.Mesh(
-            blockGeometry,
-            dirtMaterial
-        );
+    <div class="task-icon" onclick="openBrowser()">
+        🌐
+    </div>
 
-    mesh.position.set(
-        x + 0.5,
-        y + 0.5,
-        z + 0.5
-    );
+    <div class="task-icon" onclick="openWindow('settings')">
+        ⚙️
+    </div>
 
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
+    <div class="clock" id="clock">
+        <div>00:00</div>
+        <div>00/00/0000</div>
+    </div>
 
-    mesh.userData = {
-        x:x,
-        y:y,
-        z:z
-    };
+</div>
 
-    scene.add(mesh);
 
-    meshes.set(
-        key,
-        mesh
-    );
+<script>
+
+/* ------------------------------
+   INICIO
+------------------------------ */
+
+function toggleStart() {
+
+    const menu = document.getElementById("startMenu");
+
+    menu.classList.toggle("show");
+
+    document.getElementById("powerMenu").style.display = "none";
+
 }
 
 
-function removeBlock(
-    x,
-    y,
-    z
-){
+/* ------------------------------
+   VENTANAS
+------------------------------ */
 
-    const key =
-        blockKey(x,y,z);
+let zIndex = 100;
 
-    const mesh =
-        meshes.get(key);
+function openWindow(id) {
 
-    if(mesh){
+    const win = document.getElementById(id);
 
-        scene.remove(mesh);
+    win.classList.add("active");
 
-        meshes.delete(key);
+    zIndex++;
+
+    win.style.zIndex = zIndex;
+
+    document.getElementById("startMenu").classList.remove("show");
+
+}
+
+function closeWindow(id) {
+
+    document.getElementById(id).classList.remove("active");
+
+}
+
+function minimize(id) {
+
+    document.getElementById(id).classList.remove("active");
+
+}
+
+function maximize(id) {
+
+    const win = document.getElementById(id);
+
+    if (win.dataset.maximized === "true") {
+
+        win.style.left = "220px";
+        win.style.top = "80px";
+        win.style.width = "760px";
+        win.style.height = "500px";
+
+        win.dataset.maximized = "false";
+
+    } else {
+
+        win.style.left = "0";
+        win.style.top = "0";
+        win.style.width = "100%";
+        win.style.height = "calc(100% - 48px)";
+
+        win.dataset.maximized = "true";
 
     }
 
-    blocks.delete(key);
 }
 
 
-/* =====================================================
-                   MUNDO PLANO
-===================================================== */
+/* ------------------------------
+   PAPELERA
+------------------------------ */
 
-/*
-    Todo el mundo es tierra.
+function openTrash() {
 
-    Y=0 es el suelo.
-*/
+    openWindow("trashWindow");
 
-const WORLD_SIZE = 35;
+}
 
-for(
-    let x=-WORLD_SIZE;
-    x<=WORLD_SIZE;
-    x++
-){
 
-    for(
-        let z=-WORLD_SIZE;
-        z<=WORLD_SIZE;
-        z++
-    ){
+/* ------------------------------
+   NAVEGADOR
+------------------------------ */
 
-        createBlock(
-            x,
-            0,
-            z
-        );
+function openBrowser() {
 
-        createBlock(
-            x,
-            -1,
-            z
-        );
+    openWindow("browserWindow");
 
-        createBlock(
-            x,
-            -2,
-            z
+}
+
+function goBrowser() {
+
+    let value =
+        document.getElementById("browserUrl").value.trim();
+
+    if (!value) return;
+
+    if (!value.startsWith("http")) {
+
+        value = "https://" + value;
+
+    }
+
+    document.getElementById("browserPage").innerHTML =
+
+        "<h2>🌐 Navegador</h2>" +
+
+        "<p>Dirección:</p>" +
+
+        "<b>" + value + "</b>";
+
+}
+
+
+/* ------------------------------
+   RELOJ
+------------------------------ */
+
+function updateClock() {
+
+    const now = new Date();
+
+    let h = String(now.getHours()).padStart(2,"0");
+    let m = String(now.getMinutes()).padStart(2,"0");
+
+    let d = String(now.getDate()).padStart(2,"0");
+    let mo = String(now.getMonth()+1).padStart(2,"0");
+    let y = now.getFullYear();
+
+    document.getElementById("clock").innerHTML =
+
+        "<div>" + h + ":" + m + "</div>" +
+
+        "<div>" + d + "/" + mo + "/" + y + "</div>";
+
+}
+
+setInterval(updateClock,1000);
+
+updateClock();
+
+
+/* ------------------------------
+   BUSCADOR
+------------------------------ */
+
+function searchKey(event) {
+
+    if (event.key !== "Enter") return;
+
+    const text =
+        document.getElementById("searchInput").value.toLowerCase();
+
+    if (text.includes("config") ||
+        text.includes("ajustes")) {
+
+        openWindow("settings");
+
+    } else if (
+        text.includes("archivo") ||
+        text.includes("carpeta")
+    ) {
+
+        openWindow("explorer");
+
+    } else if (
+        text.includes("internet") ||
+        text.includes("navegador")
+    ) {
+
+        openBrowser();
+
+    } else {
+
+        showNotification(
+            "Búsqueda",
+            "No se encontró una aplicación llamada \"" +
+            text + "\"."
         );
 
     }
+
 }
 
 
-/* =====================================================
-                    JUGADOR
-===================================================== */
+/* ------------------------------
+   NOTIFICACIONES
+------------------------------ */
 
-const PLAYER_WIDTH = 0.58;
-
-const PLAYER_HEIGHT = 1.80;
-
-const PLAYER_RADIUS =
-    PLAYER_WIDTH / 2;
-
-
-/*
-    La posición de la cámara
-    es la cabeza.
-
-    Los pies están 1.8 bloques
-    debajo.
-*/
-
-
-function getPlayerBox(
-    pos
-){
-
-    return {
-
-        minX:
-            pos.x -
-            PLAYER_RADIUS +
-            0.002,
-
-        maxX:
-            pos.x +
-            PLAYER_RADIUS -
-            0.002,
-
-        minY:
-            pos.y -
-            PLAYER_HEIGHT +
-            0.002,
-
-        maxY:
-            pos.y -
-            0.002,
-
-        minZ:
-            pos.z -
-            PLAYER_RADIUS +
-            0.002,
-
-        maxZ:
-            pos.z +
-            PLAYER_RADIUS -
-            0.002
-
-    };
-}
-
-
-/* =====================================================
-              COLISIÓN CON BLOQUES
-===================================================== */
-
-function playerCollides(
-    pos
-){
+function showNotification(title,text) {
 
     const box =
-        getPlayerBox(pos);
+        document.getElementById("notification");
 
-    const minX =
-        Math.floor(box.minX);
+    box.querySelector("b").innerText = title;
 
-    const maxX =
-        Math.floor(box.maxX);
+    document.getElementById("notificationText").innerText = text;
 
-    const minY =
-        Math.floor(box.minY);
+    box.classList.add("show");
 
-    const maxY =
-        Math.floor(box.maxY);
+    setTimeout(() => {
 
-    const minZ =
-        Math.floor(box.minZ);
+        box.classList.remove("show");
 
-    const maxZ =
-        Math.floor(box.maxZ);
-
-
-    for(
-        let x=minX;
-        x<=maxX;
-        x++
-    ){
-
-        for(
-            let y=minY;
-            y<=maxY;
-            y++
-        ){
-
-            for(
-                let z=minZ;
-                z<=maxZ;
-                z++
-            ){
-
-                if(
-                    !blocks.has(
-                        blockKey(
-                            x,
-                            y,
-                            z
-                        )
-                    )
-                ){
-                    continue;
-                }
-
-
-                /*
-                    Intersección REAL
-                    de las dos cajas.
-                */
-
-                const hitX =
-                    box.maxX > x &&
-                    box.minX < x + 1;
-
-                const hitY =
-                    box.maxY > y &&
-                    box.minY < y + 1;
-
-                const hitZ =
-                    box.maxZ > z &&
-                    box.minZ < z + 1;
-
-
-                if(
-                    hitX &&
-                    hitY &&
-                    hitZ
-                ){
-
-                    return true;
-
-                }
-
-            }
-        }
-    }
-
-    return false;
-}
-
-
-/* =====================================================
-          MOVIMIENTO CON COLISIÓN POR PASOS
-===================================================== */
-
-let grounded = false;
-
-let velocityY = 0;
-
-const GRAVITY = 22;
-
-const JUMP_POWER = 8.5;
-
-const SPEED = 5.5;
-
-
-function movePlayer(
-    dx,
-    dy,
-    dz
-){
-
-    const p =
-        camera.position;
-
-
-    /*
-        El movimiento se divide
-        en pasos de máximo 0.025.
-
-        Esto evita atravesar bloques.
-    */
-
-    const distance =
-        Math.max(
-            Math.abs(dx),
-            Math.abs(dy),
-            Math.abs(dz)
-        );
-
-    const steps =
-        Math.max(
-            1,
-            Math.ceil(
-                distance / 0.025
-            )
-        );
-
-
-    const sx =
-        dx / steps;
-
-    const sy =
-        dy / steps;
-
-    const sz =
-        dz / steps;
-
-
-    let landed = false;
-
-
-    for(
-        let i=0;
-        i<steps;
-        i++
-    ){
-
-        /* =========================
-                    X
-        ========================= */
-
-        if(
-            sx !== 0
-        ){
-
-            const test =
-                p.clone();
-
-            test.x += sx;
-
-            if(
-                !playerCollides(test)
-            ){
-
-                p.x =
-                    test.x;
-
-            }
-
-        }
-
-
-        /* =========================
-                    Z
-        ========================= */
-
-        if(
-            sz !== 0
-        ){
-
-            const test =
-                p.clone();
-
-            test.z += sz;
-
-            if(
-                !playerCollides(test)
-            ){
-
-                p.z =
-                    test.z;
-
-            }
-
-        }
-
-
-        /* =========================
-                    Y
-        ========================= */
-
-        if(
-            sy !== 0
-        ){
-
-            const test =
-                p.clone();
-
-            test.y += sy;
-
-
-            if(
-                !playerCollides(test)
-            ){
-
-                p.y =
-                    test.y;
-
-            }
-            else{
-
-                if(
-                    sy < 0
-                ){
-
-                    landed = true;
-
-                }
-
-                velocityY = 0;
-
-                break;
-
-            }
-
-        }
-
-    }
-
-
-    grounded =
-        landed;
+    },4000);
 
 }
 
 
-/* =====================================================
-                      TECLADO
-===================================================== */
+/* ------------------------------
+   MENÚ DERECHO
+------------------------------ */
 
-const keys = {};
+document.addEventListener("contextmenu", function(e) {
 
-window.addEventListener(
-    "keydown",
-    e => {
+    e.preventDefault();
 
-        keys[e.code] = true;
+    const menu =
+        document.getElementById("contextMenu");
 
+    menu.style.left = e.clientX + "px";
 
-        if(
-            e.code === "Space"
-        ){
+    menu.style.top = e.clientY + "px";
 
-            e.preventDefault();
+    menu.style.display = "block";
 
+});
 
-            if(
-                grounded &&
-                !dead
-            ){
+document.addEventListener("click", function() {
 
-                velocityY =
-                    JUMP_POWER;
+    document.getElementById("contextMenu").style.display = "none";
 
-                grounded = false;
-
-            }
-
-        }
+});
 
 
-        /*
-            F = comer
-        */
+/* ------------------------------
+   POWER
+------------------------------ */
 
-        if(
-            e.code === "KeyF" &&
-            !dead
-        ){
+function togglePower() {
 
-            if(
-                food < 10
-            ){
+    document.getElementById("powerMenu").style.display = "block";
 
-                food++;
+}
 
-                updateHUD();
+function hidePower() {
 
-            }
+    document.getElementById("powerMenu").style.display = "none";
 
-        }
+}
 
-    }
-);
+function shutdown() {
 
+    document.getElementById("powerMenu").style.display = "none";
 
-window.addEventListener(
-    "keyup",
-    e => {
+    document.getElementById("shutdownScreen")
+        .classList.add("show");
 
-        keys[e.code] = false;
+}
 
-    }
-);
+function restart() {
 
+    document.getElementById("powerMenu").style.display = "none";
 
-/* =====================================================
-                  VIDA Y COMIDA
-===================================================== */
+    document.getElementById("shutdownScreen")
+        .classList.add("show");
 
-let health = 10;
+    setTimeout(() => {
 
-let food = 10;
+        location.reload();
 
-let dead = false;
-
-let hungerTimer = 0;
-
-const HUNGER_TIME = 15;
-
-
-function updateHUD(){
-
-    let hearts = "";
-
-    for(
-        let i=0;
-        i<10;
-        i++
-    ){
-
-        hearts +=
-            i < health
-            ? "❤️"
-            : "🖤";
-
-    }
-
-
-    let foodText = "";
-
-    for(
-        let i=0;
-        i<10;
-        i++
-    ){
-
-        foodText +=
-            i < food
-            ? "🍗"
-            : "🖤";
-
-    }
-
-
-    document.getElementById(
-        "health"
-    ).textContent =
-        hearts;
-
-
-    document.getElementById(
-        "food"
-    ).textContent =
-        foodText;
+    },3000);
 
 }
 
 
-updateHUD();
+/* ------------------------------
+   ARRASTRAR VENTANAS
+------------------------------ */
+
+document.querySelectorAll(".window").forEach(win => {
+
+    const titlebar =
+        win.querySelector(".titlebar");
+
+    let dragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    titlebar.addEventListener("mousedown", function(e) {
+
+        if (e.target.tagName === "BUTTON") return;
+
+        dragging = true;
+
+        offsetX =
+            e.clientX - win.offsetLeft;
+
+        offsetY =
+            e.clientY - win.offsetTop;
+
+        zIndex++;
+
+        win.style.zIndex = zIndex;
+
+    });
+
+    document.addEventListener("mousemove", function(e) {
+
+        if (!dragging) return;
+
+        win.style.left =
+            (e.clientX - offsetX) + "px";
+
+        win.style.top =
+            (e.clientY - offsetY) + "px";
+
+    });
+
+    document.addEventListener("mouseup", function() {
+
+        dragging = false;
+
+    });
+
+});
 
 
-function die(
-    message
-){
+/* ------------------------------
+   CERRAR MENÚ INICIO
+------------------------------ */
 
-    if(dead){
-        return;
-    }
+document.addEventListener("click", function(e) {
 
-    dead = true;
+    const menu =
+        document.getElementById("startMenu");
 
-    controls.unlock();
+    const start =
+        document.querySelector(".start-button");
 
-    document.getElementById(
-        "reason"
-    ).textContent =
-        message;
+    if (!menu.contains(e.target) &&
+        !start.contains(e.target)) {
 
-    document.getElementById(
-        "death"
-    ).style.display =
-        "flex";
-}
-
-
-function respawn(){
-
-    health = 10;
-
-    food = 10;
-
-    dead = false;
-
-    hungerTimer = 0;
-
-    velocityY = 0;
-
-    grounded = true;
-
-
-    /*
-        Suelo:
-        bloque 0 tiene techo en Y=1.
-
-        Cabeza:
-        1 + 1.8 = 2.8
-    */
-
-    camera.position.set(
-        0.5,
-        2.81,
-        8.5
-    );
-
-
-    updateHUD();
-
-
-    document.getElementById(
-        "death"
-    ).style.display =
-        "none";
-
-    controls.lock();
-
-}
-
-
-/* =====================================================
-                    HOTBAR
-===================================================== */
-
-const hotbar =
-    document.getElementById(
-        "hotbar"
-    );
-
-
-for(
-    let i=0;
-    i<6;
-    i++
-){
-
-    const slot =
-        document.createElement(
-            "div"
-        );
-
-    slot.className =
-        "slot";
-
-
-    if(i===0){
-
-        slot.classList.add(
-            "selected"
-        );
+        menu.classList.remove("show");
 
     }
 
-
-    const icon =
-        document.createElement(
-            "div"
-        );
-
-    icon.className =
-        "blockIcon";
-
-
-    const num =
-        document.createElement(
-            "div"
-        );
-
-    num.className =
-        "num";
-
-    num.textContent =
-        i + 1;
-
-
-    slot.appendChild(icon);
-
-    slot.appendChild(num);
-
-    hotbar.appendChild(slot);
-
-}
-
-
-/* =====================================================
-                SELECCIÓN DE BLOQUE
-===================================================== */
-
-let selectedBlock = 0;
-
-
-window.addEventListener(
-    "keydown",
-    e => {
-
-        if(
-            e.code.startsWith(
-                "Digit"
-            )
-        ){
-
-            const n =
-                Number(
-                    e.code.substring(5)
-                );
-
-
-            if(
-                n >= 1 &&
-                n <= 6
-            ){
-
-                selectedBlock =
-                    0;
-
-
-                Array.from(
-                    hotbar.children
-                ).forEach(
-                    (slot,i) => {
-
-                        slot.classList.toggle(
-                            "selected",
-                            i === n - 1
-                        );
-
-                    }
-                );
-
-            }
-
-        }
-
-    }
-);
-
-
-/* =====================================================
-              ROMPER Y COLOCAR
-===================================================== */
-
-const raycaster =
-    new THREE.Raycaster();
-
-
-function getTarget(){
-
-    raycaster.setFromCamera(
-        new THREE.Vector2(0,0),
-        camera
-    );
-
-
-    const hit =
-        raycaster.intersectObjects(
-            Array.from(
-                meshes.values()
-            ),
-            false
-        );
-
-
-    if(
-        hit.length &&
-        hit[0].distance <= 7
-    ){
-
-        return hit[0];
-
-    }
-
-    return null;
-}
-
-
-window.addEventListener(
-    "mousedown",
-    e => {
-
-        if(
-            !controls.isLocked ||
-            dead
-        ){
-            return;
-        }
-
-
-        const hit =
-            getTarget();
-
-
-        if(!hit){
-            return;
-        }
-
-
-        const b =
-            hit.object.userData;
-
-
-        /* =========================
-                 ROMPER
-        ========================= */
-
-        if(
-            e.button === 0
-        ){
-
-            /*
-                No romper el bloque
-                que sostiene al jugador.
-            */
-
-            const feetY =
-                camera.position.y -
-                PLAYER_HEIGHT;
-
-
-            if(
-                b.y <
-                Math.floor(
-                    feetY
-                )
-            ){
-
-                removeBlock(
-                    b.x,
-                    b.y,
-                    b.z
-                );
-
-            }
-
-        }
-
-
-        /* =========================
-                 COLOCAR
-        ========================= */
-
-        if(
-            e.button === 2
-        ){
-
-            const normal =
-                hit.face.normal;
-
-
-            const x =
-                b.x +
-                Math.round(
-                    normal.x
-                );
-
-            const y =
-                b.y +
-                Math.round(
-                    normal.y
-                );
-
-            const z =
-                b.z +
-                Math.round(
-                    normal.z
-                );
-
-
-            const key =
-                blockKey(
-                    x,
-                    y,
-                    z
-                );
-
-
-            if(
-                blocks.has(key)
-            ){
-                return;
-            }
-
-
-            /*
-                Crear temporalmente
-                para comprobar colisión.
-            */
-
-            blocks.set(
-                key,
-                "dirt"
-            );
-
-
-            const collision =
-                playerCollides(
-                    camera.position
-                );
-
-
-            blocks.delete(key);
-
-
-            if(
-                !collision
-            ){
-
-                createBlock(
-                    x,
-                    y,
-                    z
-                );
-
-            }
-
-        }
-
-    }
-);
-
-
-window.addEventListener(
-    "contextmenu",
-    e => {
-
-        e.preventDefault();
-
-    }
-);
-
-
-/* =====================================================
-                  BOTONES
-===================================================== */
-
-document.getElementById(
-    "play"
-).addEventListener(
-    "click",
-    () => {
-
-        controls.lock();
-
-    }
-);
-
-
-document.getElementById(
-    "respawn"
-).addEventListener(
-    "click",
-    () => {
-
-        respawn();
-
-    }
-);
-
-
-/* =====================================================
-                  HAMBRE
-===================================================== */
-
-function updateHunger(
-    delta
-){
-
-    hungerTimer +=
-        delta;
-
-
-    if(
-        hungerTimer >=
-        HUNGER_TIME
-    ){
-
-        hungerTimer = 0;
-
-
-        if(
-            food > 0
-        ){
-
-            food--;
-
-            updateHUD();
-
-        }
-
-
-        /*
-            Al llegar a 0:
-            MUERE.
-        */
-
-        if(
-            food <= 0
-        ){
-
-            die(
-                "Te quedaste sin comida."
-            );
-
-        }
-
-    }
-
-}
-
-
-/* =====================================================
-                     MOVIMIENTO
-===================================================== */
-
-function updateMovement(
-    delta
-){
-
-    if(
-        !controls.isLocked ||
-        dead
-    ){
-        return;
-    }
-
-
-    let forward = 0;
-
-    let right = 0;
-
-
-    if(keys.KeyW)
-        forward += 1;
-
-    if(keys.KeyS)
-        forward -= 1;
-
-    if(keys.KeyD)
-        right += 1;
-
-    if(keys.KeyA)
-        right -= 1;
-
-
-    const direction =
-        new THREE.Vector3();
-
-
-    camera.getWorldDirection(
-        direction
-    );
-
-
-    direction.y = 0;
-
-
-    if(
-        direction.lengthSq() > 0
-    ){
-
-        direction.normalize();
-
-    }
-
-
-    const rightVector =
-        new THREE.Vector3();
-
-
-    rightVector.crossVectors(
-        direction,
-        camera.up
-    );
-
-
-    rightVector.normalize();
-
-
-    const movement =
-        new THREE.Vector3();
-
-
-    movement.addScaledVector(
-        direction,
-        forward
-    );
-
-
-    movement.addScaledVector(
-        rightVector,
-        right
-    );
-
-
-    if(
-        movement.lengthSq() > 0
-    ){
-
-        movement.normalize();
-
-        movement.multiplyScalar(
-            SPEED * delta
-        );
-
-    }
-
-
-    /*
-        Gravedad
-    */
-
-    velocityY -=
-        GRAVITY * delta;
-
-
-    const dy =
-        velocityY * delta;
-
-
-    grounded = false;
-
-
-    movePlayer(
-        movement.x,
-        dy,
-        movement.z
-    );
-
-
-    /*
-        Caída al vacío.
-    */
-
-    if(
-        camera.position.y < -15
-    ){
-
-        die(
-            "Caíste al vacío."
-        );
-
-    }
-
-
-    /*
-        Coordenadas.
-    */
-
-    document.getElementById(
-        "coords"
-    ).textContent =
-        Math.floor(
-            camera.position.x
-        ) +
-        " " +
-        Math.floor(
-            camera.position.y
-        ) +
-        " " +
-        Math.floor(
-            camera.position.z
-        );
-
-}
-
-
-/* =====================================================
-                  DÍA / NOCHE
-===================================================== */
-
-let time = 0;
-
-
-function updateDayNight(
-    delta
-){
-
-    time +=
-        delta * 0.03;
-
-
-    const sunX =
-        Math.cos(time) * 50;
-
-    const sunY =
-        Math.sin(time) * 50 + 20;
-
-
-    sun.position.set(
-        sunX,
-        sunY,
-        20
-    );
-
-
-    const brightness =
-        Math.max(
-            0.18,
-            Math.sin(time) * 0.5 + 0.5
-        );
-
-
-    scene.background =
-        new THREE.Color(
-            0x87ceeb
-        );
-
-
-    light.intensity =
-        0.7 + brightness;
-
-
-    sun.intensity =
-        0.5 + brightness * 1.5;
-
-}
-
-
-/* =====================================================
-                     INICIO
-===================================================== */
-
-camera.position.set(
-    0.5,
-    2.81,
-    8.5
-);
-
-
-/* =====================================================
-                    ANIMACIÓN
-===================================================== */
-
-const clock =
-    new THREE.Clock();
-
-
-function animate(){
-
-    requestAnimationFrame(
-        animate
-    );
-
-
-    const delta =
-        Math.min(
-            clock.getDelta(),
-            0.05
-        );
-
-
-    updateMovement(
-        delta
-    );
-
-
-    updateHunger(
-        delta
-    );
-
-
-    updateDayNight(
-        delta
-    );
-
-
-    renderer.render(
-        scene,
-        camera
-    );
-
-}
-
-
-animate();
-
-
-/* =====================================================
-                    RESIZE
-===================================================== */
-
-window.addEventListener(
-    "resize",
-    () => {
-
-        camera.aspect =
-            window.innerWidth /
-            window.innerHeight;
-
-
-        camera.updateProjectionMatrix();
-
-
-        renderer.setSize(
-            window.innerWidth,
-            window.innerHeight
-        );
-
-    }
-);
+});
 
 </script>
 
 </body>
 </html>
+```
