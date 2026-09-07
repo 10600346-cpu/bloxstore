@@ -20,7 +20,7 @@
         }
         
         /* Superficie del escritorio */
-        #contenedor-escritorio {
+        #escritorio-sistema {
             width: 100%;
             height: calc(100% - 40px);
             position: absolute;
@@ -34,7 +34,7 @@
             align-items: flex-start;
         }
 
-        .acceso-directo {
+        .icono-escritorio {
             width: 80px;
             display: flex;
             flex-direction: column;
@@ -45,33 +45,86 @@
             border: 1px solid transparent;
             border-radius: 3px;
         }
-        .acceso-directo:hover {
+        .icono-escritorio:hover {
             background-color: rgba(255, 255, 255, 0.1);
             border-color: rgba(255, 255, 255, 0.2);
         }
-        .acceso-directo span.img-ico { font-size: 32px; margin-bottom: 5px; }
-        .acceso-directo span.txt-ico { color: white; font-size: 11px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
+        .icono-escritorio span.img { font-size: 32px; margin-bottom: 5px; }
+        .icono-escritorio span.txt { color: white; font-size: 11px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
 
-        /* EL MENÚ DE INICIO REAL CON TU IMAGEN INCORPORADA */
-        #menu-inicio-grafico {
+        /* MENÚ DE INICIO ADAPTADO EXACTAMENTE A TU IMAGEN */
+        #menu-inicio-interactivo {
             position: absolute;
             bottom: 40px;
             left: 0;
-            width: 630px; /* Proporción ideal de la interfaz de tu imagen */
-            height: 410px; 
-            /* Carga de forma nativa la captura real de Windows 10 con los paneles exactos que enviaste */
-            background-image: url('https://imgur.com'); 
-            background-size: cover;
-            background-position: center;
-            border-top: 1px solid rgba(255,255,255,0.15);
-            border-right: 1px solid rgba(255,255,255,0.15);
-            box-shadow: 5px 0 20px rgba(0,0,0,0.6);
+            width: 640px; 
+            height: 415px; 
+            background-color: #1f2d3d;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            border-right: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 5px 0 25px rgba(0,0,0,0.7);
             z-index: 99999;
-            display: none; /* Inicia cerrado de forma limpia */
+            display: none; /* Inicia cerrado */
+            grid-template-columns: 45px 215px 1fr;
         }
 
-        /* Ventanas Flotantes */
-        .ventana-aplicacion {
+        /* Columna Izquierda (Perfil, Apagar) */
+        .col-lateral {
+            background-color: rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 10px;
+            gap: 12px;
+        }
+        .btn-lateral { color: #aaa; font-size: 16px; cursor: pointer; padding: 10px; width: 100%; text-align: center; }
+        .btn-lateral:hover { background-color: rgba(255,255,255,0.1); color: white; }
+
+        /* Columna Central (Lista de Aplicaciones) */
+        .col-central-apps {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            color: #eee;
+            font-size: 12px;
+            overflow-y: auto;
+        }
+        .seccion-titulo { color: #888; font-size: 10px; font-weight: bold; margin: 4px 0; text-transform: uppercase; }
+        .item-app { display: flex; align-items: center; gap: 8px; padding: 6px; cursor: pointer; border-radius: 2px; }
+        .item-app:hover { background-color: rgba(255,255,255,0.1); }
+        .icon-mini { width: 16px; text-align: center; }
+
+        /* Columna Derecha (Mosaicos / Tiles de Windows 10) */
+        .col-derecha-mosaicos {
+            padding: 12px;
+            background-color: rgba(0, 0, 0, 0.05);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-auto-rows: 76px;
+            gap: 6px;
+            overflow-y: auto;
+        }
+        .mosaico {
+            background-color: #0078d7;
+            color: white;
+            padding: 8px;
+            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+        .mosaico:hover { filter: brightness(1.15); }
+        .mosaico.doble { grid-column: span 2; }
+        .mosaico.verde { background-color: #107c41; }
+        .mosaico.morado { background-color: #744da9; }
+        .mosaico.naranja { background-color: #d83b01; }
+        .mosaico-icon { font-size: 20px; }
+
+        /* Ventanas */
+        .ventana-popup {
             position: absolute;
             top: 100px;
             left: 150px;
@@ -84,22 +137,13 @@
             flex-direction: column;
             z-index: 100;
         }
-        .barra-ventana {
-            background-color: #efefef;
-            height: 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-left: 10px;
-            cursor: move;
-            border-bottom: 1px solid #d1d1d1;
-        }
-        .controles-ventana { display: flex; height: 100%; }
-        .boton-accion { width: 45px; height: 100%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        .boton-accion:hover { background-color: #e5e5e5; }
-        .contenido-ventana { padding: 15px; flex: 1; font-size: 14px; color: #333; }
+        .header-ventana { background-color: #efefef; height: 32px; display: flex; justify-content: space-between; align-items: center; padding-left: 10px; cursor: move; border-bottom: 1px solid #d1d1d1; }
+        .controles { display: flex; height: 100%; }
+        .btn-control { width: 45px; height: 100%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .btn-control:hover { background-color: #e5e5e5; }
+        .contenido { padding: 15px; flex: 1; font-size: 14px; color: #333; }
 
-        /* Barra de tareas inferior */
+        /* Barra inferior */
         #barra-tareas-fija {
             position: absolute;
             bottom: 0;
@@ -114,108 +158,86 @@
             z-index: 999999;
             border-top: 1px solid rgba(255,255,255,0.1);
         }
-        .icono-inicio-windows { width: 48px; height: 100%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        .icono-inicio-windows:hover { background-color: rgba(255,255,255,0.1); }
-        .icono-inicio-windows svg { width: 16px; height: 16px; fill: white; }
-        
-        .bandeja-reloj { display: flex; align-items: center; height: 100%; padding-right: 10px; color: white; font-size: 12px; }
+        .btn-inicio-windows { width: 48px; height: 100%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .btn-inicio-windows:hover { background-color: rgba(255,255,255,0.1); }
+        .btn-inicio-windows svg { width: 16px; height: 16px; fill: white; }
+        .reloj-tray { color: white; font-size: 11px; display: flex; flex-direction: column; align-items: flex-end; padding-right: 12px; }
     </style>
 </head>
 <body>
 
     <!-- Escritorio -->
-    <div id="contenedor-escritorio">
-        <div class="acceso-directo" ondblclick="mostrarApp('win-equipo')" onclick="event.stopPropagation()">
-            <span class="img-ico">🖥️</span>
-            <span class="txt-ico">Este Equipo</span>
+    <div id="escritorio-sistema">
+        <div class="icono-escritorio" ondblclick="abrirApp('win-equipo')" onclick="event.stopPropagation()">
+            <span class="img">🖥️</span>
+            <span class="txt">Este Equipo</span>
         </div>
-        <div class="acceso-directo" ondblclick="mostrarApp('win-notas')" onclick="event.stopPropagation()">
-            <span class="img-ico">📝</span>
-            <span class="txt-ico">Notas Pro</span>
-        </div>
-    </div>
-
-    <!-- Menú de Inicio Modificado (Muestra exactamente tu imagen al hacer clic) -->
-    <div id="menu-inicio-grafico" onclick="event.stopPropagation()"></div>
-
-    <!-- Ventanas -->
-    <div id="win-equipo" class="ventana-aplicacion" onclick="traerAlFrente('win-equipo')">
-        <div class="barra-ventana" onmousedown="comenzarArrastre(event, 'win-equipo')">
-            <span style="font-size: 12px; color: #333;">Este Equipo</span>
-            <div class="controles-ventana"><div class="boton-accion" onclick="ocultarApp('win-equipo')">✕</div></div>
-        </div>
-        <div class="contenido-ventana"><p>🔵 Disco Local (C:) - Funcionando correctamente.</p></div>
-    </div>
-
-    <div id="win-notes" class="ventana-aplicacion" onclick="traerAlFrente('win-notes')">
-        <div class="barra-ventana" onmousedown="comenzarArrastre(event, 'win-notes')">
-            <span style="font-size: 12px; color: #333;">Bloc de notas</span>
-            <div class="controles-ventana"><div class="boton-accion" onclick="ocultarApp('win-notes')">✕</div></div>
-        </div>
-        <div class="contenido-ventana" style="padding:0;"><textarea style="width:100%; height:100%; border:none; padding:10px; resize:none; outline:none;"></textarea></div>
-    </div>
-
-    <!-- Barra de tareas -->
-    <div id="barra-tareas-fija">
-        <div class="icono-inicio-windows" id="btnDisparador" onclick="alternarMenuReal(event)">
-            <svg viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.45H0V3.449zM0 12.45h9.75v9.45L0 20.551v-8.102zM10.95 1.95L24 0v11.55H10.95V1.95zM10.95 12.45H24v11.55l-13.05-1.95v-9.6z"/></svg>
-        </div>
-        <div class="bandeja-reloj">
-            <div style="display: flex; flex-direction: column; align-items: flex-end; padding: 0 10px;">
-                <span id="reloj-h">00:00</span>
-                <span id="reloj-f">01/01/2026</span>
-            </div>
+        <div class="icono-escritorio" ondblclick="abrirApp('win-notas')" onclick="event.stopPropagation()">
+            <span class="img">📝</span>
+            <span class="txt">Notas Pro</span>
         </div>
     </div>
 
-    <script>
-        // Reloj del sistema
-        function relojActivo() {
-            var tiempo = new Date();
-            var horas = tiempo.getHours();
-            var minutos = tiempo.getMinutes();
-            var dia = tiempo.getDate();
-            var mes = tiempo.getMonth() + 1;
-            var anio = tiempo.getFullYear();
+    <!-- MENÚ DE INICIO CONSTRUIDO CON LOS PANELES EXACTOS DE TU IMAGEN -->
+    <div id="menu-inicio-interactivo" onclick="event.stopPropagation()">
+        <!-- Barra de usuario e iconos mínimos (Izquierda) -->
+        <div class="col-lateral">
+            <div class="btn-lateral" title="Usuario">👤</div>
+            <div class="btn-lateral" title="Documentos">📄</div>
+            <div class="btn-lateral" title="Imágenes">🖼️</div>
+            <div class="btn-lateral" title="Configuración">⚙️</div>
+            <div class="btn-lateral" title="Apagar / Reiniciar" onclick="location.reload()">⚠️</div>
+        </div>
 
-            horas = horas < 10 ? '0' + horas : horas;
-            minutos = minutos < 10 ? '0' + minutos : minutos;
-            dia = dia < 10 ? '0' + dia : dia;
-            mes = mes < 10 ? '0' + mes : mes;
-
-            document.getElementById('reloj-h').innerText = horas + ':' + minutos;
-            document.getElementById('reloj-f').innerText = dia + '/' + mes + '/' + anio;
-        }
-        relojActivo();
-        setInterval(relojActivo, 1000);
-
-        // Control del menú de inicio gráfico (Cero Alertas JavaScript de texto)
-        function alternarMenuReal(event) {
-            if (event) event.stopPropagation();
-            var controlMenu = document.getElementById('menu-inicio-grafico');
-            var estaAbierto = controlMenu.style.display === 'block';
+        <!-- Lista Central de Aplicaciones Reales de tu Foto -->
+        <div class="col-central-apps">
+            <div class="seccion-titulo">Agregadas recientemente</div>
+            <div class="item-app"><span class="icon-mini">🛡️</span><span>Avast SecureLine</span></div>
+            <div class="item-app"><span class="icon-mini">🔥</span><span>Avast Free Antivirus</span></div>
             
-            forzarCierre();
-            if (!estaAbierto) {
-                controlMenu.style.display = 'block';
-            }
-        }
+            <div class="seccion-titulo">Más usadas</div>
+            <div class="item-app"><span class="icon-mini">🌐</span><span>Google Chrome</span></div>
+            <div class="item-app"><span class="icon-mini">📘</span><span>Microsoft Word 2010</span></div>
+            <div class="item-app"><span class="icon-mini">📁</span><span>File Explorer</span></div>
+            <div class="item-app"><span class="icon-mini">📙</span><span>Microsoft PowerPoint 2010</span></div>
+            <div class="item-app"><span class="icon-mini">🎮</span><span>Creative Cloud</span></div>
+            <div class="item-app"><span class="icon-mini">🧭</span><span>Microsoft Edge</span></div>
 
-        function mostrarApp(id) { var ventana = document.getElementById(id); if (ventana) { ventana.style.display = 'flex'; traerAlFrente(id); } }
-        function ocultarApp(id) { var ventana = document.getElementById(id); if (ventana) ventana.style.display = 'none'; }
-        function traerAlFrente(id) { document.querySelectorAll('.ventana-aplicacion').forEach(w => w.style.zIndex = '100'); var ventana = document.getElementById(id); if (ventana) ventana.style.zIndex = '200'; }
+            <div class="seccion-titulo">3</div>
+            <div class="item-app"><span class="icon-mini">📦</span><span>3D Viewer</span></div>
+            <div class="item-app"><span class="icon-mini">🤐</span><span>7-Zip</span></div>
+        </div>
 
-        // Manejo de arrastre
-        var winObjeto = null;
-        var inicioMouseX, inicioMouseY, posicionX, posicionY;
-        function comenzarArrastre(e, id) { winObjeto = document.getElementById(id); traerAlFrente(id); inicioMouseX = e.clientX; inicioMouseY = e.clientY; posicionX = winObjeto.offsetLeft; posicionY = winObjeto.offsetTop; document.addEventListener('mousemove', arrastrandoVentana); document.addEventListener('mouseup', finArrastre); }
-        function arrastrandoVentana(e) { if (!winObjeto) return; var distX = e.clientX - inicioMouseX; var distY = e.clientY - inicioMouseY; winObjeto.style.left = (posicionX + distX) + 'px'; winObjeto.style.top = (posicionY + distY) + 'px'; }
-        function finArrastre() { document.removeEventListener('mousemove', arrastrandoVentana); document.removeEventListener('mouseup', finArrastre); winObjeto = null; }
+        <!-- Paneles y Mosaicos Interactivos (Derecha) -->
+        <div class="col-derecha-mosaicos">
+            <!-- Sección: Life at a glance -->
+            <div class="mosaico doble">
+                <span class="mosaico-icon">📅</span>
+                <span>Calendario de Outlook</span>
+            </div>
+            <div class="mosaico naranja">
+                <span class="mosaico-icon">🍊</span>
+                <span>VLC Player</span>
+            </div>
+            <div class="mosaico">
+                <span class="mosaico-icon">🧭</span>
+                <span>Microsoft Edge</span>
+            </div>
+            <div class="mosaico doble" style="background-color: #5133ab;">
+                <span class="mosaico-icon">👥</span>
+                <span>Fotos Familiares</span>
+            </div>
+            <div class="mosaico">
+                <span class="mosaico-icon">🔵</span>
+                <span>Cortana</span>
+            </div>
 
-        function forzarCierre() {
-            document.getElementById('menu-inicio-grafico').style.display = 'none';
-        }
-        document.getElementById('contenedor-escritorio').addEventListener('click', forzarCierre);
-    </script>
-</body>
-</html>
+            <!-- Sección: Play and explore -->
+            <div class="mosaico verde">
+                <span class="mosaico-icon">🎮</span>
+                <span>Xbox Live</span>
+            </div>
+            <div class="mosaico">
+                <span class="mosaico-icon">🃏</span>
+                <span>Solitario</span>
+            </div>
