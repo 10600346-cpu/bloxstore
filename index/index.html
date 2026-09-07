@@ -1,0 +1,1796 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>VoxelCraft</title>
+
+<style>
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#87ceeb;
+    font-family:Arial,sans-serif;
+}
+
+canvas{
+    display:block;
+}
+
+#menu{
+    position:fixed;
+    inset:0;
+    z-index:20;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:rgba(0,0,0,.7);
+    color:white;
+}
+
+.panel{
+    text-align:center;
+    background:#222;
+    padding:35px;
+    border-radius:15px;
+    box-shadow:0 0 30px #000;
+}
+
+#play,#respawn{
+    border:0;
+    border-radius:8px;
+    padding:14px 40px;
+    font-size:21px;
+    font-weight:bold;
+    cursor:pointer;
+    background:#55b83e;
+    color:white;
+}
+
+#play:hover,#respawn:hover{
+    background:#6bd34d;
+}
+
+#crosshair{
+    position:fixed;
+    z-index:5;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    color:white;
+    font-size:25px;
+    pointer-events:none;
+    text-shadow:0 0 5px black;
+}
+
+#hotbar{
+    position:fixed;
+    z-index:5;
+    bottom:15px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:4px;
+}
+
+.slot{
+    width:48px;
+    height:48px;
+    background:rgba(0,0,0,.7);
+    border:2px solid #777;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:white;
+    font-size:12px;
+}
+
+.slot.selected{
+    border:2px solid white;
+    box-shadow:0 0 8px white;
+}
+
+.block{
+    width:30px;
+    height:30px;
+}
+
+#stats{
+    position:fixed;
+    z-index:5;
+    top:10px;
+    left:10px;
+    color:white;
+    background:rgba(0,0,0,.5);
+    padding:8px 12px;
+    border-radius:8px;
+    text-shadow:1px 1px 2px black;
+    font-size:20px;
+}
+
+#health{
+    letter-spacing:2px;
+}
+
+#food{
+    letter-spacing:2px;
+    margin-top:3px;
+}
+
+#coords{
+    font-size:12px;
+    margin-top:4px;
+}
+
+#dead{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:30;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.75);
+    color:white;
+}
+
+#dead h1{
+    font-size:45px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="menu">
+    <div class="panel">
+        <h1>🌍 VoxelCraft</h1>
+        <p>WASD = mover</p>
+        <p>Mouse = mirar</p>
+        <p>Espacio = saltar</p>
+        <p>Clic izquierdo = romper</p>
+        <p>Clic derecho = colocar</p>
+        <p>1 - 6 = seleccionar bloque</p>
+        <br>
+        <button id="play">JUGAR</button>
+    </div>
+</div>
+
+<div id="dead">
+    <div class="panel">
+        <h1>💀 MORISTE</h1>
+        <p id="deathReason">Tu comida llegó a 0.</p>
+        <button id="respawn">REAPARECER</button>
+    </div>
+</div>
+
+<div id="stats">
+    <div id="health">❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️</div>
+    <div id="food">🍗🍗🍗🍗🍗🍗🍗🍗🍗🍗</div>
+    <div id="coords">0 0 0</div>
+</div>
+
+<div id="crosshair">+</div>
+
+<div id="hotbar"></div>
+
+<script type="importmap">
+{
+    "imports":{
+        "three":"https://cdn.jsdelivr.net/npm/three@0.177.0/build/three.module.js",
+        "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.177.0/examples/jsm/"
+    }
+}
+</script>
+
+<script type="module">
+
+import * as THREE from "three";
+import {PointerLockControls} from
+"https://cdn.jsdelivr.net/npm/three@0.177.0/examples/jsm/controls/PointerLockControls.js";
+
+
+/* =========================================
+                 ESCENA
+========================================= */
+
+const scene = new THREE.Scene();
+
+scene.background =
+new THREE.Color(0x87ceeb);
+
+scene.fog =
+new THREE.Fog(
+    0x87ceeb,
+    30,
+    100
+);
+
+
+/* =========================================
+                 CÁMARA
+========================================= */
+
+const camera =
+new THREE.PerspectiveCamera(
+    75,
+    innerWidth/innerHeight,
+    0.05,
+    150
+);
+
+camera.position.set(
+    0,
+    8,
+    10
+);
+
+
+/* =========================================
+                 RENDER
+========================================= */
+
+const renderer =
+new THREE.WebGLRenderer({
+    antialias:false
+});
+
+renderer.setSize(
+    innerWidth,
+    innerHeight
+);
+
+renderer.setPixelRatio(
+    Math.min(
+        devicePixelRatio,
+        2
+    )
+);
+
+renderer.shadowMap.enabled=true;
+
+document.body.appendChild(
+    renderer.domElement
+);
+
+
+/* =========================================
+                  LUZ
+========================================= */
+
+const hemi =
+new THREE.HemisphereLight(
+    0xffffff,
+    0x555555,
+    2
+);
+
+scene.add(hemi);
+
+
+const sun =
+new THREE.DirectionalLight(
+    0xffffff,
+    2
+);
+
+sun.position.set(
+    30,
+    60,
+    20
+);
+
+sun.castShadow=true;
+
+scene.add(sun);
+
+
+/* =========================================
+                 CONTROLES
+========================================= */
+
+const controls =
+new PointerLockControls(
+    camera,
+    document.body
+);
+
+scene.add(
+    controls.object
+);
+
+
+/* =========================================
+                 BLOQUES
+========================================= */
+
+const materials={
+
+    grass:
+    new THREE.MeshLambertMaterial({
+        color:0x4caf3a
+    }),
+
+    dirt:
+    new THREE.MeshLambertMaterial({
+        color:0x8b5a2b
+    }),
+
+    stone:
+    new THREE.MeshLambertMaterial({
+        color:0x777777
+    }),
+
+    wood:
+    new THREE.MeshLambertMaterial({
+        color:0x8b5a2b
+    }),
+
+    leaves:
+    new THREE.MeshLambertMaterial({
+        color:0x2e8b35,
+        transparent:true,
+        opacity:.9
+    }),
+
+    sand:
+    new THREE.MeshLambertMaterial({
+        color:0xd9c27a
+    })
+
+};
+
+
+const blockTypes=[
+    "grass",
+    "dirt",
+    "stone",
+    "wood",
+    "leaves",
+    "sand"
+];
+
+
+const blocks =
+new Map();
+
+const meshes =
+new Map();
+
+
+function blockKey(x,y,z){
+
+    return `${x},${y},${z}`;
+
+}
+
+
+function createBlock(
+    x,
+    y,
+    z,
+    type
+){
+
+    const key =
+    blockKey(x,y,z);
+
+    if(
+        blocks.has(key)
+    )
+        return;
+
+    blocks.set(
+        key,
+        type
+    );
+
+
+    const geometry =
+    new THREE.BoxGeometry(
+        1,
+        1,
+        1
+    );
+
+
+    const mesh =
+    new THREE.Mesh(
+        geometry,
+        materials[type]
+    );
+
+
+    mesh.position.set(
+        x+.5,
+        y+.5,
+        z+.5
+    );
+
+
+    mesh.castShadow=true;
+    mesh.receiveShadow=true;
+
+
+    mesh.userData={
+        x,
+        y,
+        z,
+        type
+    };
+
+
+    scene.add(mesh);
+
+    meshes.set(
+        key,
+        mesh
+    );
+
+}
+
+
+function removeBlock(
+    x,
+    y,
+    z
+){
+
+    const key =
+    blockKey(x,y,z);
+
+
+    blocks.delete(key);
+
+
+    const mesh =
+    meshes.get(key);
+
+
+    if(mesh){
+
+        scene.remove(mesh);
+
+        mesh.geometry.dispose();
+
+        meshes.delete(key);
+
+    }
+
+}
+
+
+/* =========================================
+                 TERRENO
+========================================= */
+
+function terrainHeight(x,z){
+
+    return Math.floor(
+        5 +
+        Math.sin(x*.15)*2 +
+        Math.cos(z*.17)*2 +
+        Math.sin((x+z)*.08)*2
+    );
+
+}
+
+
+const WORLD_SIZE=30;
+
+
+for(
+    let x=-WORLD_SIZE;
+    x<WORLD_SIZE;
+    x++
+){
+
+    for(
+        let z=-WORLD_SIZE;
+        z<WORLD_SIZE;
+        z++
+    ){
+
+        const h =
+        Math.max(
+            1,
+            terrainHeight(x,z)
+        );
+
+
+        for(
+            let y=0;
+            y<=h;
+            y++
+        ){
+
+            let type="stone";
+
+
+            if(
+                y===h
+            ){
+
+                type="grass";
+
+            }
+            else if(
+                y>=h-2
+            ){
+
+                type="dirt";
+
+            }
+
+
+            createBlock(
+                x,
+                y,
+                z,
+                type
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================
+                   ÁRBOLES
+========================================= */
+
+function createTree(x,z){
+
+    const h =
+    terrainHeight(x,z);
+
+
+    if(h<4)
+        return;
+
+
+    for(
+        let y=h+1;
+        y<=h+4;
+        y++
+    ){
+
+        createBlock(
+            x,
+            y,
+            z,
+            "wood"
+        );
+
+    }
+
+
+    for(
+        let dx=-2;
+        dx<=2;
+        dx++
+    ){
+
+        for(
+            let dz=-2;
+            dz<=2;
+            dz++
+        ){
+
+            for(
+                let dy=3;
+                dy<=5;
+                dy++
+            ){
+
+                if(
+                    Math.abs(dx)+
+                    Math.abs(dz)+
+                    (dy===5?1:0)
+                    <=3
+                ){
+
+                    createBlock(
+                        x+dx,
+                        h+dy,
+                        z+dz,
+                        "leaves"
+                    );
+
+                }
+
+            }
+
+        }
+
+    }
+
+}
+
+
+for(
+    let x=-25;
+    x<25;
+    x+=5
+){
+
+    for(
+        let z=-25;
+        z<25;
+        z+=5
+    ){
+
+        if(
+            Math.random()<.3 &&
+            Math.hypot(x,z)>7
+        ){
+
+            createTree(
+                x,
+                z
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================
+             VIDA Y COMIDA
+========================================= */
+
+/*
+    10 corazones
+    10 puntos de comida
+*/
+
+let health=10;
+
+let food=10;
+
+let dead=false;
+
+let hungerTimer=0;
+
+const HUNGER_TIME=25;
+
+
+function updateHUD(){
+
+    let hearts="";
+
+    for(
+        let i=0;
+        i<10;
+        i++
+    ){
+
+        hearts +=
+        i<health
+        ? "❤️"
+        : "🖤";
+
+    }
+
+
+    let foodText="";
+
+    for(
+        let i=0;
+        i<10;
+        i++
+    ){
+
+        foodText +=
+        i<food
+        ? "🍗"
+        : "🖤";
+
+    }
+
+
+    document.getElementById(
+        "health"
+    ).textContent=hearts;
+
+
+    document.getElementById(
+        "food"
+    ).textContent=foodText;
+
+}
+
+
+updateHUD();
+
+
+function damage(amount,reason){
+
+    if(dead)
+        return;
+
+
+    health -= amount;
+
+    health =
+    Math.max(
+        0,
+        health
+    );
+
+
+    updateHUD();
+
+
+    if(
+        health<=0
+    ){
+
+        die(reason);
+
+    }
+
+}
+
+
+function die(reason){
+
+    dead=true;
+
+    controls.unlock();
+
+    document.getElementById(
+        "deathReason"
+    ).textContent=reason;
+
+
+    document.getElementById(
+        "dead"
+    ).style.display="flex";
+
+}
+
+
+function respawn(){
+
+    dead=false;
+
+    health=10;
+
+    food=10;
+
+    hungerTimer=0;
+
+    controls.object.position.set(
+        0,
+        12,
+        10
+    );
+
+
+    velocityY=0;
+
+
+    document.getElementById(
+        "dead"
+    ).style.display="none";
+
+
+    updateHUD();
+
+    controls.lock();
+
+}
+
+
+/* =========================================
+                JUGADOR
+========================================= */
+
+const keys={};
+
+let velocityY=0;
+
+let grounded=false;
+
+let fallStartY=null;
+
+const speed=6;
+
+const gravity=22;
+
+const jumpPower=8;
+
+const playerHeight=1.7;
+
+const playerRadius=.28;
+
+
+/* =========================================
+        COLISIÓN CORREGIDA
+========================================= */
+
+/*
+    Esta es la parte que evita atravesar
+    los bloques.
+
+    El jugador se trata como una caja.
+    Se comprueba cada eje por separado.
+
+    Así no puede meterse dentro de un bloque
+    aunque vaya rápido o choque de lado.
+*/
+
+function playerCollides(pos){
+
+    const minX =
+    pos.x-playerRadius;
+
+    const maxX =
+    pos.x+playerRadius;
+
+    const minY =
+    pos.y;
+
+    const maxY =
+    pos.y+playerHeight;
+
+    const minZ =
+    pos.z-playerRadius;
+
+    const maxZ =
+    pos.z+playerRadius;
+
+
+    const startX =
+    Math.floor(minX);
+
+    const endX =
+    Math.floor(maxX);
+
+
+    const startY =
+    Math.floor(minY);
+
+    const endY =
+    Math.floor(maxY-.001);
+
+
+    const startZ =
+    Math.floor(minZ);
+
+    const endZ =
+    Math.floor(maxZ);
+
+
+    for(
+        let x=startX;
+        x<=endX;
+        x++
+    ){
+
+        for(
+            let y=startY;
+            y<=endY;
+            y++
+        ){
+
+            for(
+                let z=startZ;
+                z<=endZ;
+                z++
+            ){
+
+                if(
+                    blocks.has(
+                        blockKey(
+                            x,
+                            y,
+                            z
+                        )
+                    )
+                ){
+
+                    return true;
+
+                }
+
+            }
+
+        }
+
+    }
+
+
+    return false;
+
+}
+
+
+/*
+    Movimiento separado por ejes.
+*/
+
+function movePlayer(
+    dx,
+    dy,
+    dz
+){
+
+    const p =
+    controls.object.position;
+
+
+    /* X */
+
+    if(dx!==0){
+
+        const test =
+        p.clone();
+
+        test.x += dx;
+
+
+        if(
+            !playerCollides(test)
+        ){
+
+            p.x=test.x;
+
+        }
+
+    }
+
+
+    /* Z */
+
+    if(dz!==0){
+
+        const test =
+        p.clone();
+
+        test.z += dz;
+
+
+        if(
+            !playerCollides(test)
+        ){
+
+            p.z=test.z;
+
+        }
+
+    }
+
+
+    /* Y */
+
+    if(dy!==0){
+
+        const test =
+        p.clone();
+
+        test.y += dy;
+
+
+        if(
+            !playerCollides(test)
+        ){
+
+            p.y=test.y;
+
+            grounded=false;
+
+        }
+        else{
+
+            if(dy<0){
+
+                grounded=true;
+
+            }
+
+            velocityY=0;
+
+        }
+
+    }
+
+}
+
+
+/* =========================================
+              TECLADO
+========================================= */
+
+window.addEventListener(
+    "keydown",
+    event=>{
+
+        keys[event.code]=true;
+
+
+        if(
+            event.code==="Space"
+        ){
+
+            event.preventDefault();
+
+
+            if(
+                grounded &&
+                !dead
+            ){
+
+                velocityY=
+                jumpPower;
+
+                grounded=false;
+
+            }
+
+        }
+
+    }
+);
+
+
+window.addEventListener(
+    "keyup",
+    event=>{
+
+        keys[event.code]=false;
+
+    }
+);
+
+
+/* =========================================
+          ROMPER / COLOCAR
+========================================= */
+
+const raycaster =
+new THREE.Raycaster();
+
+
+let selectedBlock=0;
+
+
+function getTarget(){
+
+    raycaster.setFromCamera(
+        new THREE.Vector2(0,0),
+        camera
+    );
+
+
+    const objects =
+    [...meshes.values()];
+
+
+    const hits =
+    raycaster.intersectObjects(
+        objects,
+        false
+    );
+
+
+    if(
+        hits.length &&
+        hits[0].distance<7
+    ){
+
+        return hits[0];
+
+    }
+
+
+    return null;
+
+}
+
+
+window.addEventListener(
+    "mousedown",
+    event=>{
+
+        if(
+            !controls.isLocked ||
+            dead
+        )
+            return;
+
+
+        const hit =
+        getTarget();
+
+
+        if(!hit)
+            return;
+
+
+        const b =
+        hit.object.userData;
+
+
+        /* ROMPER */
+
+        if(
+            event.button===0
+        ){
+
+            /*
+                No romper el bloque debajo
+                del jugador.
+            */
+
+            const px =
+            Math.floor(
+                controls.object.position.x
+            );
+
+            const py =
+            Math.floor(
+                controls.object.position.y
+            );
+
+            const pz =
+            Math.floor(
+                controls.object.position.z
+            );
+
+
+            if(
+                !(b.x===px &&
+                  b.z===pz &&
+                  b.y<=py)
+            ){
+
+                removeBlock(
+                    b.x,
+                    b.y,
+                    b.z
+                );
+
+            }
+
+        }
+
+
+        /* COLOCAR */
+
+        if(
+            event.button===2
+        ){
+
+            const normal =
+            hit.face.normal;
+
+
+            const x =
+            b.x+
+            Math.round(normal.x);
+
+
+            const y =
+            b.y+
+            Math.round(normal.y);
+
+
+            const z =
+            b.z+
+            Math.round(normal.z);
+
+
+            /*
+                No colocar un bloque
+                dentro del jugador.
+            */
+
+            const test =
+            controls.object.position.clone();
+
+
+            const blockCenter =
+            new THREE.Vector3(
+                x+.5,
+                y,
+                z+.5
+            );
+
+
+            const distance =
+            Math.sqrt(
+                Math.pow(
+                    test.x-blockCenter.x,
+                    2
+                )+
+                Math.pow(
+                    test.z-blockCenter.z,
+                    2
+                )
+            );
+
+
+            if(
+                !blocks.has(
+                    blockKey(
+                        x,
+                        y,
+                        z
+                    )
+                ) &&
+                distance>.7
+            ){
+
+                createBlock(
+                    x,
+                    y,
+                    z,
+                    blockTypes[
+                        selectedBlock
+                    ]
+                );
+
+            }
+
+        }
+
+    }
+);
+
+
+window.addEventListener(
+    "contextmenu",
+    e=>e.preventDefault()
+);
+
+
+/* =========================================
+                  HOTBAR
+========================================= */
+
+const hotbar =
+document.getElementById(
+    "hotbar"
+);
+
+
+const colors=[
+    "#4caf3a",
+    "#8b5a2b",
+    "#777777",
+    "#9b6a35",
+    "#2e8b35",
+    "#d9c27a"
+];
+
+
+blockTypes.forEach(
+    (type,index)=>{
+
+        const slot =
+        document.createElement(
+            "div"
+        );
+
+
+        slot.className="slot";
+
+
+        const block =
+        document.createElement(
+            "div"
+        );
+
+
+        block.className="block";
+
+        block.style.background =
+        colors[index];
+
+
+        slot.appendChild(block);
+
+
+        slot.innerHTML +=
+        `<span>${index+1}</span>`;
+
+
+        hotbar.appendChild(slot);
+
+    }
+);
+
+
+function selectBlock(index){
+
+    selectedBlock=index;
+
+
+    [
+        ...hotbar.children
+    ].forEach(
+        (slot,i)=>{
+
+            slot.classList.toggle(
+                "selected",
+                i===index
+            );
+
+        }
+    );
+
+}
+
+
+selectBlock(0);
+
+
+window.addEventListener(
+    "keydown",
+    event=>{
+
+        if(
+            event.code.startsWith(
+                "Digit"
+            )
+        ){
+
+            const n =
+            Number(
+                event.code.substring(5)
+            )-1;
+
+
+            if(
+                n>=0 &&
+                n<blockTypes.length
+            ){
+
+                selectBlock(n);
+
+            }
+
+        }
+
+    }
+);
+
+
+/* =========================================
+                 JUGAR
+========================================= */
+
+document.getElementById(
+    "play"
+).addEventListener(
+    "click",
+    ()=>{
+
+        controls.lock();
+
+    }
+);
+
+
+document.getElementById(
+    "respawn"
+).addEventListener(
+    "click",
+    ()=>{
+
+        respawn();
+
+    }
+);
+
+
+controls.addEventListener(
+    "lock",
+    ()=>{
+
+        if(!dead){
+
+            document.getElementById(
+                "menu"
+            ).style.display="none";
+
+        }
+
+    }
+);
+
+
+controls.addEventListener(
+    "unlock",
+    ()=>{
+
+        if(!dead){
+
+            document.getElementById(
+                "menu"
+            ).style.display="flex";
+
+        }
+
+    }
+);
+
+
+/* =========================================
+             CICLO DE DÍA
+========================================= */
+
+let worldTime=0;
+
+
+/* =========================================
+                 ANIMACIÓN
+========================================= */
+
+const clock =
+new THREE.Clock();
+
+
+function animate(){
+
+    requestAnimationFrame(
+        animate
+    );
+
+
+    const dt =
+    Math.min(
+        clock.getDelta(),
+        .05
+    );
+
+
+    if(
+        controls.isLocked &&
+        !dead
+    ){
+
+        let forward=0;
+
+        let side=0;
+
+
+        if(keys.KeyW)
+            forward+=1;
+
+        if(keys.KeyS)
+            forward-=1;
+
+        if(keys.KeyA)
+            side-=1;
+
+        if(keys.KeyD)
+            side+=1;
+
+
+        const direction =
+        new THREE.Vector3();
+
+
+        camera.getWorldDirection(
+            direction
+        );
+
+
+        direction.y=0;
+
+        direction.normalize();
+
+
+        const right =
+        new THREE.Vector3()
+        .crossVectors(
+            direction,
+            camera.up
+        )
+        .normalize();
+
+
+        const movement =
+        new THREE.Vector3();
+
+
+        movement.addScaledVector(
+            direction,
+            forward
+        );
+
+
+        movement.addScaledVector(
+            right,
+            side
+        );
+
+
+        if(
+            movement.length()>0
+        ){
+
+            movement.normalize();
+
+        }
+
+
+        movement.multiplyScalar(
+            speed*dt
+        );
+
+
+        /* =====================
+              GRAVEDAD
+        ===================== */
+
+        velocityY -=
+        gravity*dt;
+
+
+        /*
+            Guardar altura antes
+            de caer.
+        */
+
+        if(
+            velocityY<0 &&
+            fallStartY===null
+        ){
+
+            fallStartY =
+            controls.object.position.y;
+
+        }
+
+
+        const oldY =
+        controls.object.position.y;
+
+
+        movePlayer(
+            movement.x,
+            velocityY*dt,
+            movement.z
+        );
+
+
+        /*
+            Daño por caída.
+        */
+
+        if(
+            grounded &&
+            fallStartY!==null
+        ){
+
+            const fallDistance =
+            fallStartY -
+            controls.object.position.y;
+
+
+            if(
+                fallDistance>4
+            ){
+
+                const damage =
+                Math.floor(
+                    (fallDistance-3)/2
+                );
+
+
+                if(damage>0){
+
+                    damagePlayer(
+                        damage
+                    );
+
+                }
+
+            }
+
+
+            fallStartY=null;
+
+        }
+
+
+        /*
+            Si sigue subiendo,
+            todavía no está cayendo.
+        */
+
+        if(
+            velocityY>0
+        ){
+
+            fallStartY=null;
+
+        }
+
+
+        /* =====================
+              HAMBRE
+        ===================== */
+
+        hungerTimer += dt;
+
+
+        if(
+            hungerTimer>=HUNGER_TIME
+        ){
+
+            hungerTimer=0;
+
+
+            if(food>0){
+
+                food--;
+
+                updateHUD();
+
+            }
+
+
+            /*
+                Si llega a 0,
+                empieza a morir.
+            */
+
+            if(
+                food<=0
+            ){
+
+                damage(
+                    1,
+                    "Te quedaste sin comida."
+                );
+
+            }
+
+        }
+
+
+        /*
+            Si cae fuera del mundo.
+        */
+
+        if(
+            controls.object.position.y
+            < -20
+        ){
+
+            damage(
+                10,
+                "Caíste al vacío."
+            );
+
+        }
+
+
+        /* =====================
+                COORDENADAS
+        ===================== */
+
+        document.getElementById(
+            "coords"
+        ).textContent =
+        `${Math.floor(
+            camera.position.x
+        )} ${
+            Math.floor(
+                camera.position.y
+            )
+        } ${
+            Math.floor(
+                camera.position.z
+            )
+        }`;
+
+    }
+
+
+    /* =====================
+            DÍA/NOCHE
+    ===================== */
+
+    worldTime +=
+    dt*.015;
+
+
+    const sunX =
+    Math.cos(worldTime)*45;
+
+
+    const sunY =
+    Math.sin(worldTime)*55+15;
+
+
+    sun.position.set(
+        sunX,
+        sunY,
+        20
+    );
+
+
+    const daylight =
+    Math.max(
+        .2,
+        Math.sin(worldTime)*.5+.5
+    );
+
+
+    scene.background.setHSL(
+        .58,
+        .65,
+        .42*daylight+.18
+    );
+
+
+    scene.fog.color.copy(
+        scene.background
+    );
+
+
+    renderer.render(
+        scene,
+        camera
+    );
+
+}
+
+
+animate();
+
+
+/* =========================================
+              DAÑO DE CAÍDA
+========================================= */
+
+function damagePlayer(amount){
+
+    damage(
+        amount,
+        "La caída te hizo demasiado daño."
+    );
+
+}
+
+
+/* =========================================
+                 RESIZE
+========================================= */
+
+window.addEventListener(
+    "resize",
+    ()=>{
+
+        camera.aspect =
+        innerWidth/innerHeight;
+
+
+        camera.updateProjectionMatrix();
+
+
+        renderer.setSize(
+            innerWidth,
+            innerHeight
+        );
+
+    }
+);
+
+</script>
+
+</body>
+</html>
+```
