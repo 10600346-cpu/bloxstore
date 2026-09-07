@@ -1,1 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mini Clon de Minecraft</title>
+    <style>
+        body { margin: 0; overflow: hidden; } /* Quita los bordes de la página */
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <!-- Importamos la librería Three.js para el 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // 1. Configurar la escena y el cielo
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87CEEB); // Color azul cielo
 
+        // 2. Configurar la cámara
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 5, 10); // Posición (x, y, z)
+        camera.lookAt(0, 0, 0); // Mirar hacia el centro
+
+        // 3. Configurar el renderizador
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // 4. Crear los bloques (Geometría y Material)
+        const blockGeometry = new THREE.BoxGeometry(1, 1, 1);
+        const blockMaterial = new THREE.MeshBasicMaterial({ color: 0x228B22 }); // Verde pasto
+        const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x000000 }); // Bordes negros
+
+        // 5. Generar un piso de 11x11 bloques
+        for (let x = -5; x <= 5; x++) {
+            for (let z = -5; z <= 5; z++) {
+                const block = new THREE.Mesh(blockGeometry, blockMaterial);
+                block.position.set(x, 0, z);
+                
+                // Agregar bordes para que se parezca más a Minecraft
+                const edges = new THREE.EdgesGeometry(blockGeometry);
+                const line = new THREE.LineSegments(edges, edgeMaterial);
+                block.add(line);
+
+                scene.add(block);
+            }
+        }
+
+        // 6. Hacer que la cámara gire lentamente para ver el mundo
+        function animate() {
+            requestAnimationFrame(animate);
+            camera.position.x = Math.sin(Date.now() * 0.001) * 10;
+            camera.position.z = Math.cos(Date.now() * 0.001) * 10;
+            camera.lookAt(0, 0, 0);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // 7. Ajustar si cambias el tamaño de la ventana
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+    </script>
+</body>
+</html>
