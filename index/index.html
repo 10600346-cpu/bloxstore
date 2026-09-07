@@ -52,7 +52,7 @@
         .icono-escritorio span.img { font-size: 32px; margin-bottom: 5px; }
         .icono-escritorio span.txt { color: white; font-size: 11px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
 
-        /* MENÚ DE INICIO ADAPTADO EXACTAMENTE A TU IMAGEN */
+        /* MENÚ DE INICIO EXACTO A TU IMAGEN */
         #menu-inicio-interactivo {
             position: absolute;
             bottom: 40px;
@@ -96,7 +96,7 @@
         .item-app:hover { background-color: rgba(255,255,255,0.1); }
         .icon-mini { width: 16px; text-align: center; }
 
-        /* Columna Derecha (Mosaicos / Tiles de Windows 10) */
+        /* Columna Derecha (Mosaicos de tu foto) */
         .col-derecha-mosaicos {
             padding: 12px;
             background-color: rgba(0, 0, 0, 0.05);
@@ -123,7 +123,7 @@
         .mosaico.naranja { background-color: #d83b01; }
         .mosaico-icon { font-size: 20px; }
 
-        /* Ventanas */
+        /* Ventanas Flotantes */
         .ventana-popup {
             position: absolute;
             top: 100px;
@@ -143,7 +143,7 @@
         .btn-control:hover { background-color: #e5e5e5; }
         .contenido { padding: 15px; flex: 1; font-size: 14px; color: #333; }
 
-        /* Barra inferior */
+        /* BARRA DE TAREAS CORREGIDA Y VISIBLE */
         #barra-tareas-fija {
             position: absolute;
             bottom: 0;
@@ -158,10 +158,27 @@
             z-index: 999999;
             border-top: 1px solid rgba(255,255,255,0.1);
         }
-        .btn-inicio-windows { width: 48px; height: 100%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .btn-inicio-windows { 
+            width: 48px; 
+            height: 100%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            cursor: pointer; 
+        }
         .btn-inicio-windows:hover { background-color: rgba(255,255,255,0.1); }
         .btn-inicio-windows svg { width: 16px; height: 16px; fill: white; }
-        .reloj-tray { color: white; font-size: 11px; display: flex; flex-direction: column; align-items: flex-end; padding-right: 12px; }
+        
+        .reloj-tray { 
+            color: white; 
+            font-size: 11px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: flex-end; 
+            padding-right: 12px; 
+            justify-content: center;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
@@ -178,60 +195,45 @@
         </div>
     </div>
 
-    <!-- MENÚ DE INICIO CONSTRUIDO CON LOS PANELES EXACTOS DE TU IMAGEN -->
+    <!-- Menú de Inicio Completo -->
     <div id="menu-inicio-interactivo" onclick="event.stopPropagation()">
-        <!-- Barra de usuario e iconos mínimos (Izquierda) -->
+        <!-- Barra lateral -->
         <div class="col-lateral">
             <div class="btn-lateral" title="Usuario">👤</div>
             <div class="btn-lateral" title="Documentos">📄</div>
             <div class="btn-lateral" title="Imágenes">🖼️</div>
             <div class="btn-lateral" title="Configuración">⚙️</div>
-            <div class="btn-lateral" title="Apagar / Reiniciar" onclick="location.reload()">⚠️</div>
+            <div class="btn-lateral" title="Reiniciar" onclick="location.reload()">⚠️</div>
         </div>
 
-        <!-- Lista Central de Aplicaciones Reales de tu Foto -->
+        <!-- Lista Central -->
         <div class="col-central-apps">
             <div class="seccion-titulo">Agregadas recientemente</div>
             <div class="item-app"><span class="icon-mini">🛡️</span><span>Avast SecureLine</span></div>
             <div class="item-app"><span class="icon-mini">🔥</span><span>Avast Free Antivirus</span></div>
             
             <div class="seccion-titulo">Más usadas</div>
-            <div class="item-app" onclick="abrirApp('win-equipo')"><span class="icon-mini">🖥️</span><span>File Explorer (Este Equipo)</span></div>
+            <div class="item-app" onclick="abrirApp('win-equipo')"><span class="icon-mini">🖥️</span><span>File Explorer</span></div>
             <div class="item-app" onclick="abrirApp('win-notas')"><span class="icon-mini">📝</span><span>Bloc de Notas</span></div>
             <div class="item-app"><span class="icon-mini">🌐</span><span>Google Chrome</span></div>
             <div class="item-app"><span class="icon-mini">📘</span><span>Microsoft Word 2010</span></div>
             <div class="item-app"><span class="icon-mini">📙</span><span>Microsoft PowerPoint 2010</span></div>
-            <div class="item-app"><span class="icon-mini">🎮</span><span>Creative Cloud</span></div>
             <div class="item-app"><span class="icon-mini">🧭</span><span>Microsoft Edge</span></div>
-
-            <div class="seccion-titulo">3</div>
-            <div class="item-app"><span class="icon-mini">📦</span><span>3D Viewer</span></div>
-            <div class="item-app"><span class="icon-mini">🤐</span><span>7-Zip</span></div>
         </div>
 
-        <!-- Paneles y Mosaicos Interactivos (Derecha) -->
+        <!-- Mosaicos de tu foto -->
         <div class="col-derecha-mosaicos">
-            <!-- Sección: Life at a glance -->
-            <div class="mosaico doble">
-                <span class="mosaico-icon">📅</span>
-                <span>Calendario de Outlook</span>
-            </div>
-            <div class="mosaico naranja">
-                <span class="mosaico-icon">🍊</span>
-                <span>VLC Player</span>
-            </div>
-            <div class="mosaico">
-                <span class="mosaico-icon">🧭</span>
-                <span>Microsoft Edge</span>
-            </div>
-            <div class="mosaico doble" style="background-color: #5133ab;">
-                <span class="mosaico-icon">👥</span>
-                <span>Fotos Familiares</span>
-            </div>
-            <div class="mosaico">
-                <span class="mosaico-icon">🔵</span>
-                <span>Cortana</span>
-            </div>
+            <div class="mosaico doble"><span class="mosaico-icon">📅</span><span>Calendario de Outlook</span></div>
+            <div class="mosaico naranja"><span class="mosaico-icon">🍊</span><span>VLC Player</span></div>
+            <div class="mosaico"><span class="mosaico-icon">🧭</span><span>Microsoft Edge</span></div>
+            <div class="mosaico doble" style="background-color: #5133ab;"><span class="mosaico-icon">👥</span><span>Fotos Familiares</span></div>
+            <div class="mosaico"><span class="mosaico-icon">🔵</span><span>Cortana</span></div>
+            <div class="mosaico verde"><span class="mosaico-icon">🎮</span><span>Xbox Live</span></div>
+            <div class="mosaico"><span class="mosaico-icon">🃏</span><span>Solitario</span></div>
+            <div class="mosaico" style="background-color: #1f1f1f;"><span class="mosaico-icon">⛏️</span><span>Minecraft</span></div>
+            <div class="mosaico doble" style="background-color: #002446;"><span class="mosaico-icon">📰</span><span>Noticias</span></div>
+            <div class="mosaico morado"><span class="mosaico-icon">💜</span><span>OneNote</span></div>
+        </div>
+    </div>
 
-            <!-- Sección: Play and explore -->
-            <div class="mosaico verde">
+    <!-- Ventanas -->
