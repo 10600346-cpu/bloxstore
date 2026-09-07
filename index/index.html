@@ -2001,3 +2001,235 @@ if(event.button === 2){
     }
 
 }
+/* =========================================
+       COLISIÓN ULTRA SEGURA
+========================================= */
+
+const PLAYER_WIDTH = 0.60;
+const PLAYER_HEIGHT = 1.80;
+
+const PLAYER_RADIUS = PLAYER_WIDTH / 2;
+
+
+/*
+    La cámara está en la cabeza.
+    Los pies están 1.8 bloques debajo.
+*/
+function getPlayerBox(pos){
+
+    return {
+        minX: pos.x - PLAYER_RADIUS + 0.001,
+        maxX: pos.x + PLAYER_RADIUS - 0.001,
+
+        minY: pos.y - PLAYER_HEIGHT + 0.001,
+        maxY: pos.y - 0.001,
+
+        minZ: pos.z - PLAYER_RADIUS + 0.001,
+        maxZ: pos.z + PLAYER_RADIUS - 0.001
+    };
+
+}
+
+
+/*
+    Comprueba si la caja del jugador
+    realmente INTERSECTA un bloque.
+*/
+function playerCollides(pos){
+
+    const box = getPlayerBox(pos);
+
+    const minX = Math.floor(box.minX);
+    const maxX = Math.floor(box.maxX);
+
+    const minY = Math.floor(box.minY);
+    const maxY = Math.floor(box.maxY);
+
+    const minZ = Math.floor(box.minZ);
+    const maxZ = Math.floor(box.maxZ);
+
+
+    for(let x=minX; x<=maxX; x++){
+
+        for(let y=minY; y<=maxY; y++){
+
+            for(let z=minZ; z<=maxZ; z++){
+
+                if(
+                    blocks.has(
+                        blockKey(x,y,z)
+                    )
+                ){
+
+                    /*
+                        Caja del bloque
+                    */
+
+                    const blockMinX = x;
+                    const blockMaxX = x + 1;
+
+                    const blockMinY = y;
+                    const blockMaxY = y + 1;
+
+                    const blockMinZ = z;
+                    const blockMaxZ = z + 1;
+
+
+                    const intersects =
+
+                        box.maxX > blockMinX &&
+                        box.minX < blockMaxX &&
+
+                        box.maxY > blockMinY &&
+                        box.minY < blockMaxY &&
+
+                        box.maxZ > blockMinZ &&
+                        box.minZ < blockMaxZ;
+
+
+                    if(intersects){
+
+                        return true;
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+    return false;
+
+}
+
+
+/*
+    Movimiento por pasos pequeños.
+
+    Esto evita atravesar bloques cuando
+    el jugador se mueve rápidamente.
+*/
+function movePlayer(dx,dy,dz){
+
+    const p = controls.object.position;
+
+
+    /*
+        Cuántos pasos necesitamos.
+        Máximo 0.08 bloques por paso.
+    */
+
+    const distance =
+        Math.max(
+            Math.abs(dx),
+            Math.abs(dy),
+            Math.abs(dz)
+        );
+
+
+    const steps =
+        Math.max(
+            1,
+            Math.ceil(distance / 0.08)
+        );
+
+
+    const stepX = dx / steps;
+    const stepY = dy / steps;
+    const stepZ = dz / steps;
+
+
+    grounded = false;
+
+
+    for(let i=0;i<steps;i++){
+
+        /* =========================
+                  X
+        ========================= */
+
+        if(stepX !== 0){
+
+            const test = p.clone();
+
+            test.x += stepX;
+
+
+            if(
+                !playerCollides(test)
+            ){
+
+                p.x = test.x;
+
+            }
+
+        }
+
+
+        /* =========================
+                  Z
+        ========================= */
+
+        if(stepZ !== 0){
+
+            const test = p.clone();
+
+            test.z += stepZ;
+
+
+            if(
+                !playerCollides(test)
+            ){
+
+                p.z = test.z;
+
+            }
+
+        }
+
+
+        /* =========================
+                  Y
+        ========================= */
+
+        if(stepY !== 0){
+
+            const test = p.clone();
+
+            test.y += stepY;
+
+
+            if(
+                !playerCollides(test)
+            ){
+
+                p.y = test.y;
+
+            }
+            else{
+
+                /*
+                    Chocó con el suelo.
+                */
+
+                if(stepY < 0){
+
+                    grounded = true;
+
+                }
+
+
+                velocityY = 0;
+
+                break;
+
+            }
+
+        }
+
+    }
+
+}
