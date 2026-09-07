@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Windows 10 Pro Simulation</title>
+    <title>Windows 10 Pro Final</title>
     <style>
         * {
             box-sizing: border-box;
@@ -19,14 +19,14 @@
             background: radial-gradient(circle at 80% 50%, #175e9b 0%, #002e62 70%);
         }
         
-        /* Contenedor del Escritorio */
-        #desktop {
+        /* Superficie del escritorio */
+        #contenedor-escritorio {
             width: 100%;
             height: calc(100% - 40px);
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 1;
+            z-index: 5;
             padding: 20px;
             display: flex;
             flex-direction: column;
@@ -34,8 +34,7 @@
             align-items: flex-start;
         }
 
-        /* Iconos del Escritorio */
-        .desktop-icon {
+        .acceso-directo {
             width: 80px;
             display: flex;
             flex-direction: column;
@@ -46,35 +45,36 @@
             border: 1px solid transparent;
             border-radius: 3px;
         }
-        .desktop-icon:hover {
+        .acceso-directo:hover {
             background-color: rgba(255, 255, 255, 0.1);
             border-color: rgba(255, 255, 255, 0.2);
         }
-        .desktop-icon span.icon-img { font-size: 32px; margin-bottom: 5px; }
-        .desktop-icon span.icon-text { color: white; font-size: 11px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
+        .acceso-directo span.img-ico { font-size: 32px; margin-bottom: 5px; }
+        .acceso-directo span.txt-ico { color: white; font-size: 11px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
 
-        /* MENÚ DE INICIO CON LA IMAGEN REAL INCORPORADA */
-        #start-menu {
+        /* EL MENÚ DE INICIO REAL CON TU IMAGEN INCORPORADA */
+        #menu-inicio-grafico {
             position: absolute;
             bottom: 40px;
             left: 0;
-            width: 630px; /* Ancho ajustado a la escala de la imagen original */
-            height: 410px; /* Alto proporcional de la interfaz de Windows */
-            background-image: url('https://imgur.com'); /* Carga la captura real de Windows 10 con todos sus mosaicos */
+            width: 630px; /* Proporción ideal de la interfaz de tu imagen */
+            height: 410px; 
+            /* Carga de forma nativa la captura real de Windows 10 con los paneles exactos que enviaste */
+            background-image: url('https://imgur.com'); 
             background-size: cover;
             background-position: center;
             border-top: 1px solid rgba(255,255,255,0.15);
             border-right: 1px solid rgba(255,255,255,0.15);
             box-shadow: 5px 0 20px rgba(0,0,0,0.6);
-            z-index: 10000;
-            display: none; /* Inicia cerrado */
+            z-index: 99999;
+            display: none; /* Inicia cerrado de forma limpia */
         }
 
-        /* Ventanas Interactivas */
-        .window {
+        /* Ventanas Flotantes */
+        .ventana-aplicacion {
             position: absolute;
-            top: 80px;
-            left: 120px;
+            top: 100px;
+            left: 150px;
             width: 450px;
             height: 300px;
             background-color: #ffffff;
@@ -84,7 +84,7 @@
             flex-direction: column;
             z-index: 100;
         }
-        .window-header {
+        .barra-ventana {
             background-color: #efefef;
             height: 32px;
             display: flex;
@@ -94,13 +94,13 @@
             cursor: move;
             border-bottom: 1px solid #d1d1d1;
         }
-        .window-controls { display: flex; height: 100%; }
-        .win-btn { width: 45px; height: 100%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        .win-btn:hover { background-color: #e5e5e5; }
-        .window-content { padding: 15px; flex: 1; font-size: 14px; color: #333; }
+        .controles-ventana { display: flex; height: 100%; }
+        .boton-accion { width: 45px; height: 100%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .boton-accion:hover { background-color: #e5e5e5; }
+        .contenido-ventana { padding: 15px; flex: 1; font-size: 14px; color: #333; }
 
         /* Barra de tareas inferior */
-        #taskbar {
+        #barra-tareas-fija {
             position: absolute;
             bottom: 0;
             left: 0;
@@ -111,112 +111,111 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 9999;
+            z-index: 999999;
             border-top: 1px solid rgba(255,255,255,0.1);
         }
-        .start-btn { width: 48px; height: 100%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        .start-btn:hover { background-color: rgba(255,255,255,0.1); }
-        .start-btn svg { width: 16px; height: 16px; fill: white; }
+        .icono-inicio-windows { width: 48px; height: 100%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .icono-inicio-windows:hover { background-color: rgba(255,255,255,0.1); }
+        .icono-inicio-windows svg { width: 16px; height: 16px; fill: white; }
         
-        .system-tray { display: flex; align-items: center; height: 100%; padding-right: 10px; color: white; font-size: 12px; }
-        .clock-widget { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; padding: 0 10px; height: 100%; }
+        .bandeja-reloj { display: flex; align-items: center; height: 100%; padding-right: 10px; color: white; font-size: 12px; }
     </style>
 </head>
 <body>
 
     <!-- Escritorio -->
-    <div id="desktop">
-        <div class="desktop-icon" ondblclick="abrirPrograma('win-pc')" onclick="event.stopPropagation()">
-            <span class="icon-img">🖥️</span>
-            <span class="icon-text">Este Equipo</span>
+    <div id="contenedor-escritorio">
+        <div class="acceso-directo" ondblclick="mostrarApp('win-equipo')" onclick="event.stopPropagation()">
+            <span class="img-ico">🖥️</span>
+            <span class="txt-ico">Este Equipo</span>
         </div>
-        <div class="desktop-icon" ondblclick="abrirPrograma('win-notes')" onclick="event.stopPropagation()">
-            <span class="icon-img">📝</span>
-            <span class="icon-text">Notas Pro</span>
+        <div class="acceso-directo" ondblclick="mostrarApp('win-notas')" onclick="event.stopPropagation()">
+            <span class="img-ico">📝</span>
+            <span class="txt-ico">Notas Pro</span>
         </div>
     </div>
 
-    <!-- Menú de Inicio Real con la Imagen Integrada -->
-    <div id="start-menu" onclick="event.stopPropagation()"></div>
+    <!-- Menú de Inicio Modificado (Muestra exactamente tu imagen al hacer clic) -->
+    <div id="menu-inicio-grafico" onclick="event.stopPropagation()"></div>
 
-    <!-- Ventanas simuladas -->
-    <div id="win-pc" class="window" onclick="enfocarVentana('win-pc')">
-        <div class="window-header" onmousedown="iniciarArrastre(event, 'win-pc')">
+    <!-- Ventanas -->
+    <div id="win-equipo" class="ventana-aplicacion" onclick="traerAlFrente('win-equipo')">
+        <div class="barra-ventana" onmousedown="comenzarArrastre(event, 'win-equipo')">
             <span style="font-size: 12px; color: #333;">Este Equipo</span>
-            <div class="window-controls"><div class="win-btn" onclick="cerrarPrograma('win-pc')">✕</div></div>
+            <div class="controles-ventana"><div class="boton-accion" onclick="ocultarApp('win-equipo')">✕</div></div>
         </div>
-        <div class="window-content"><p>🔵 Disco Local (C:) - Conectado y seguro.</p></div>
+        <div class="contenido-ventana"><p>🔵 Disco Local (C:) - Funcionando correctamente.</p></div>
     </div>
 
-    <div id="win-notes" class="window" onclick="enfocarVentana('win-notes')">
-        <div class="window-header" onmousedown="iniciarArrastre(event, 'win-notes')">
+    <div id="win-notes" class="ventana-aplicacion" onclick="traerAlFrente('win-notes')">
+        <div class="barra-ventana" onmousedown="comenzarArrastre(event, 'win-notes')">
             <span style="font-size: 12px; color: #333;">Bloc de notas</span>
-            <div class="window-controls"><div class="win-btn" onclick="cerrarPrograma('win-notes')">✕</div></div>
+            <div class="controles-ventana"><div class="boton-accion" onclick="ocultarApp('win-notes')">✕</div></div>
         </div>
-        <div class="window-content" style="padding:0;"><textarea style="width:100%; height:100%; border:none; padding:10px; resize:none; outline:none;"></textarea></div>
+        <div class="contenido-ventana" style="padding:0;"><textarea style="width:100%; height:100%; border:none; padding:10px; resize:none; outline:none;"></textarea></div>
     </div>
 
     <!-- Barra de tareas -->
-    <div id="taskbar">
-        <div class="start-btn" id="startBtn" onclick="conmutarMenuInicio(event)">
+    <div id="barra-tareas-fija">
+        <div class="icono-inicio-windows" id="btnDisparador" onclick="alternarMenuReal(event)">
             <svg viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.45H0V3.449zM0 12.45h9.75v9.45L0 20.551v-8.102zM10.95 1.95L24 0v11.55H10.95V1.95zM10.95 12.45H24v11.55l-13.05-1.95v-9.6z"/></svg>
         </div>
-        <div class="system-tray">
-            <div class="clock-widget">
-                <span id="taskbar-time">00:00</span>
-                <span id="taskbar-date">01/01/2026</span>
+        <div class="bandeja-reloj">
+            <div style="display: flex; flex-direction: column; align-items: flex-end; padding: 0 10px;">
+                <span id="reloj-h">00:00</span>
+                <span id="reloj-f">01/01/2026</span>
             </div>
         </div>
     </div>
 
     <script>
-        // Reloj en tiempo real
-        function actualizarReloj() {
-            var fecha = new Date();
-            var h = fecha.getHours();
-            var m = fecha.getMinutes();
-            var d = fecha.getDate();
-            var mes = fecha.getMonth() + 1;
-            var a = fecha.getFullYear();
+        // Reloj del sistema
+        function relojActivo() {
+            var tiempo = new Date();
+            var horas = tiempo.getHours();
+            var minutos = tiempo.getMinutes();
+            var dia = tiempo.getDate();
+            var mes = tiempo.getMonth() + 1;
+            var anio = tiempo.getFullYear();
 
-            h = h < 10 ? '0' + h : h;
-            m = m < 10 ? '0' + m : m;
-            d = d < 10 ? '0' + d : d;
+            horas = horas < 10 ? '0' + horas : horas;
+            minutos = minutos < 10 ? '0' + minutos : minutos;
+            dia = dia < 10 ? '0' + dia : dia;
             mes = mes < 10 ? '0' + mes : mes;
 
-            document.getElementById('taskbar-time').innerText = h + ':' + m;
-            document.getElementById('taskbar-date').innerText = d + '/' + mes + '/' + a;
+            document.getElementById('reloj-h').innerText = horas + ':' + minutos;
+            document.getElementById('reloj-f').innerText = dia + '/' + mes + '/' + anio;
         }
-        actualizarReloj();
-        setInterval(actualizarReloj, 1000);
+        relojActivo();
+        setInterval(relojActivo, 1000);
 
-        // Conmutador del Menú de Inicio (Abre y cierra visualmente sin alertas grises)
-        function conmutarMenuInicio(event) {
+        // Control del menú de inicio gráfico (Cero Alertas JavaScript de texto)
+        function alternarMenuReal(event) {
             if (event) event.stopPropagation();
-            var menu = document.getElementById('start-menu');
-            var desplegado = menu.style.display === 'block';
+            var controlMenu = document.getElementById('menu-inicio-grafico');
+            var estaAbierto = controlMenu.style.display === 'block';
             
-            ocultarMenu();
-            if (!desplegado) {
-                menu.style.display = 'block';
+            forzarCierre();
+            if (!estaAbierto) {
+                controlMenu.style.display = 'block';
             }
         }
 
-        function abrirPrograma(id) { var el = document.getElementById(id); if (el) { el.style.display = 'flex'; enfocarVentana(id); } }
-        function cerrarPrograma(id) { var el = document.getElementById(id); if (el) el.style.display = 'none'; }
-        function enfocarVentana(id) { document.querySelectorAll('.window').forEach(w => w.style.zIndex = '100'); var el = document.getElementById(id); if (el) el.style.zIndex = '200'; }
+        function mostrarApp(id) { var ventana = document.getElementById(id); if (ventana) { ventana.style.display = 'flex'; traerAlFrente(id); } }
+        function ocultarApp(id) { var ventana = document.getElementById(id); if (ventana) ventana.style.display = 'none'; }
+        function traerAlFrente(id) { document.querySelectorAll('.ventana-aplicacion').forEach(w => w.style.zIndex = '100'); var ventana = document.getElementById(id); if (ventana) ventana.style.zIndex = '200'; }
 
-        // Manejo del arrastre de las ventanas
-        var winMoviendo = null;
-        var mouseX, mouseY, posX, posY;
-        function iniciarArrastre(e, id) { winMoviendo = document.getElementById(id); enfocarVentana(id); mouseX = e.clientX; mouseY = e.clientY; posX = winMoviendo.offsetLeft; posY = winMoviendo.offsetTop; document.addEventListener('mousemove', moverElemento); document.addEventListener('mouseup', detenerElemento); }
-        function moverElemento(e) { if (!winMoviendo) return; var dx = e.clientX - mouseX; var dy = e.clientY - mouseY; winMoviendo.style.left = (posX + dx) + 'px'; winMoviendo.style.top = (posY + dy) + 'px'; }
-        function detenerElemento() { document.removeEventListener('mousemove', moverElemento); document.removeEventListener('mouseup', detenerElemento); winMoviendo = null; }
+        // Manejo de arrastre
+        var winObjeto = null;
+        var inicioMouseX, inicioMouseY, posicionX, posicionY;
+        function comenzarArrastre(e, id) { winObjeto = document.getElementById(id); traerAlFrente(id); inicioMouseX = e.clientX; inicioMouseY = e.clientY; posicionX = winObjeto.offsetLeft; posicionY = winObjeto.offsetTop; document.addEventListener('mousemove', arrastrandoVentana); document.addEventListener('mouseup', finArrastre); }
+        function arrastrandoVentana(e) { if (!winObjeto) return; var distX = e.clientX - inicioMouseX; var distY = e.clientY - inicioMouseY; winObjeto.style.left = (posicionX + distX) + 'px'; winObjeto.style.top = (posicionY + distY) + 'px'; }
+        function finArrastre() { document.removeEventListener('mousemove', arrastrandoVentana); document.removeEventListener('mouseup', finArrastre); winObjeto = null; }
 
-        function ocultarMenu() {
-            document.getElementById('start-menu').style.display = 'none';
+        function forzarCierre() {
+            document.getElementById('menu-inicio-grafico').style.display = 'none';
         }
-        document.getElementById('desktop').addEventListener('click', ocultarMenu);
+        document.getElementById('contenedor-escritorio').addEventListener('click', forzarCierre);
     </script>
 </body>
 </html>
