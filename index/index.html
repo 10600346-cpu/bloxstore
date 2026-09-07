@@ -177,14 +177,15 @@
 
     <!-- Popover de Batería -->
     <div id="battery-popover" class="popover">
-        <h4>Batería de Laptop</h4>
+        <h4>Batería y Gráficos (WebGL)</h4>
         <p id="battery-status">Sincronizando telemetría...</p>
         <p id="battery-charging"></p>
+        <p id="webgl-status" style="border-top: 1px solid #444; margin-top: 8px; padding-top: 8px; color: #4af;"></p>
     </div>
 
     <script>
-        // Control de la pantalla de carga (Ejecución forzada sin fallos)
-        window.addEventListener('load', () => {
+        // Control forzado de la pantalla de carga
+        window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 const bootScreen = document.getElementById('boot-screen');
                 if (bootScreen) {
@@ -193,14 +194,14 @@
                         bootScreen.style.display = 'none';
                     }, 500);
                 }
-            }, 3000); // Se quita automáticamente a los 3 segundos
+            }, 3000); // 3 segundos exactos
             
             actualizarReloj();
             setInterval(actualizarReloj, 1000);
             inicializarHardware();
         });
 
-        // Reloj del sistema limpio
+        // Reloj corregido y limpio sin bucles extraños
         function actualizarReloj() {
             const ahora = new Date();
             let horas = ahora.getHours();
@@ -240,15 +241,16 @@
             });
         }
 
-        // Eventos del escritorio
+        // Interacciones del Escritorio
         document.getElementById('desktop').addEventListener('click', cerrarTodosLosPopovers);
         document.getElementById('startBtn').addEventListener('click', (e) => {
             e.stopPropagation();
-            alert("Menú de Inicio Windows 10 Pro activo.");
+            alert("Menú de Inicio Windows 10 Pro cargado correctamente.");
         });
 
-        // Telemetría de hardware (Compatible con ChromeOS/Chromebook)
+        // Telemetría de hardware (Wi-Fi, Batería y estado WebGL)
         function inicializarHardware() {
+            // Monitor de red Wi-Fi
             function verificarConexion() {
                 const online = navigator.onLine;
                 const statusTxt = document.getElementById('wifi-status');
@@ -268,8 +270,6 @@
             window.addEventListener('offline', verificarConexion);
             verificarConexion();
 
-            if ('getBattery' in navigator) {
-                navigator.getBattery().then(function(battery) {
-                    function updateBatteryInfo() {
-                        const porcentaje = Math.round(battery.level * 100);
-                        const statusTxt = document.getElementById('battery-status');
+            // Lector de Estado de Aceleración Gráfica WebGL Real
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
