@@ -19,7 +19,7 @@
             background: radial-gradient(circle at 80% 50%, #175e9b 0%, #002e62 70%);
         }
         
-        /* Escritorio */
+        /* Contenedor del Escritorio */
         #desktop {
             width: 100%;
             height: calc(100% - 40px);
@@ -34,6 +34,7 @@
             align-items: flex-start;
         }
 
+        /* Iconos del Escritorio */
         .desktop-icon {
             width: 80px;
             display: flex;
@@ -51,6 +52,81 @@
         }
         .desktop-icon span.icon-img { font-size: 32px; margin-bottom: 5px; }
         .desktop-icon span.icon-text { color: white; font-size: 11px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
+
+        /* MENÚ DE INICIO REAL DE WINDOWS 10 (Estilo mosaico) */
+        #start-menu {
+            position: absolute;
+            bottom: 40px;
+            left: 0;
+            width: 620px;
+            height: 500px;
+            background-color: rgba(25, 25, 25, 0.95);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+            z-index: 10000;
+            display: none; /* Oculto al inicio */
+            grid-template-columns: 45px 225px 1fr;
+        }
+
+        /* Columna izquierda (Apagar, Config) */
+        .start-sidebar {
+            background-color: rgba(10, 10, 10, 0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 10px;
+            gap: 15px;
+        }
+        .sidebar-icon { color: #ccc; font-size: 18px; cursor: pointer; padding: 10px; width: 100%; text-align: center; }
+        .sidebar-icon:hover { background-color: rgba(255,255,255,0.1); color: white; }
+
+        /* Lista central de aplicaciones */
+        .start-apps-list {
+            padding: 15px 10px;
+            overflow-y: auto;
+            color: #ddd;
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .app-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+        .app-item:hover { background-color: rgba(255,255,255,0.1); }
+
+        /* Cuadrícula de paneles (Tiles) de la derecha */
+        .start-tiles-grid {
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-auto-rows: 90px;
+            gap: 8px;
+        }
+        .tile {
+            background-color: #0078d7;
+            color: white;
+            padding: 10px;
+            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+        .tile:hover { filter: brightness(1.1); }
+        .tile.wide { grid-column: span 2; background-color: #d83b01; }
+        .tile.green { background-color: #107c41; }
+        .tile-icon { font-size: 24px; }
 
         /* Ventanas */
         .window {
@@ -76,97 +152,10 @@
             cursor: move;
             border-bottom: 1px solid #d1d1d1;
         }
-        .window-title { font-size: 12px; color: #333333; }
         .window-controls { display: flex; height: 100%; }
-        .win-btn {
-            width: 45px;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 14px;
-            cursor: pointer;
-        }
+        .win-btn { width: 45px; height: 100%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .win-btn:hover { background-color: #e5e5e5; }
-        .win-btn.close:hover { background-color: #e81123; color: white; }
         .window-content { padding: 15px; flex: 1; font-size: 14px; color: #333; }
-
-        /* NUEVO MENÚ DE INICIO REAL DE WINDOWS 10 */
-        #start-menu {
-            position: absolute;
-            bottom: 40px;
-            left: 0;
-            width: 620px;
-            height: 500px;
-            background-color: rgba(25, 25, 25, 0.95);
-            backdrop-filter: blur(15px);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            border-right: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
-            z-index: 10000;
-            display: none;
-            grid-template-columns: 45px 225px 1fr;
-        }
-
-        /* Barra de opciones izquierda (Apagar, Config) */
-        .start-sidebar {
-            background-color: rgba(10, 10, 10, 0.4);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            align-items: center;
-            padding-bottom: 10px;
-            gap: 15px;
-        }
-        .sidebar-icon { color: #ccc; font-size: 18px; cursor: pointer; padding: 10px; width: 100%; text-align: center; }
-        .sidebar-icon:hover { background-color: rgba(255,255,255,0.1); color: white; }
-
-        /* Lista de aplicaciones del medio */
-        .start-apps-list {
-            padding: 15px 10px;
-            overflow-y: auto;
-            color: #ddd;
-            font-size: 13px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .app-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 6px;
-            cursor: pointer;
-            border-radius: 2px;
-        }
-        .app-item:hover { background-color: rgba(255,255,255,0.1); }
-        .app-icon-small { font-size: 16px; }
-
-        /* Panel de mosaicos de la derecha (Tiles) */
-        .start-tiles-grid {
-            padding: 15px;
-            background-color: rgba(0, 0, 0, 0.1);
-            overflow-y: auto;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-auto-rows: 90px;
-            gap: 8px;
-        }
-        .tile {
-            background-color: #0078d7;
-            color: white;
-            padding: 10px;
-            font-size: 12px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-        .tile:hover { transform: scale(0.98); filter: brightness(1.1); }
-        .tile.wide { grid-column: span 2; background-color: #d83b01; }
-        .tile.green { background-color: #107c41; }
-        .tile-icon { font-size: 24px; }
 
         /* Barra de tareas */
         #taskbar {
@@ -191,21 +180,17 @@
         .tray-icon { padding: 0 12px; height: 100%; display: flex; align-items: center; cursor: pointer; }
         .tray-icon:hover { background-color: rgba(255,255,255,0.1); }
         .clock-widget { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; padding: 0 10px; height: 100%; cursor: pointer; }
-        .clock-widget:hover { background-color: rgba(255,255,255,0.1); }
 
         .popover {
             position: absolute;
             bottom: 45px;
             right: 10px;
             background: rgba(28, 28, 28, 0.95);
-            backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.15);
             color: white;
             padding: 15px;
-            border-radius: 2px;
             display: none;
             width: 290px;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.6);
             z-index: 10000;
         }
     </style>
@@ -224,44 +209,40 @@
         </div>
     </div>
 
-    <!-- Menú de Inicio Adaptado Real de la Imagen -->
+    <!-- El Menú de Inicio Reconstruído sin Alertas de Texto -->
     <div id="start-menu" onclick="event.stopPropagation()">
-        <!-- Barra Lateral Izquierda -->
+        <!-- Barra de Configuración lateral -->
         <div class="start-sidebar">
-            <div class="sidebar-icon" title="Usuario">👤</div>
-            <div class="sidebar-icon" title="Configuración">⚙️</div>
-            <div class="sidebar-icon" title="Apagar" onclick="location.reload()"> Telling ⚙️</div>
+            <div class="sidebar-icon">👤</div>
+            <div class="sidebar-icon">⚙️</div>
+            <div class="sidebar-icon" onclick="location.reload()">🔄</div>
         </div>
 
-        <!-- Lista Central de Aplicaciones -->
+        <!-- Lista Central de Programas -->
         <div class="start-apps-list">
-            <div style="color: #666; font-size: 11px; font-weight: bold; padding-left: 5px;">Más usadas</div>
-            <div class="app-item" onclick="openWindow('win-pc'); toggleStartMenu(event)">
-                <span class="app-icon-small">🖥️</span> <span>Este Equipo</span>
-            </div>
-            <div class="app-item" onclick="openWindow('win-notes'); toggleStartMenu(event)">
-                <span class="app-icon-small">📝</span> <span>Notas Pro</span>
-            </div>
-            <div class="app-item"><span class="app-icon-small">🌐</span> <span>Microsoft Edge</span></div>
-            <div class="app-item"><span class="app-icon-small">📁</span> <span>Explorador de archivos</span></div>
+            <div style="color: #888; font-size: 11px; font-weight: bold; padding: 0 5px 5px 5px;">Más usadas</div>
+            <div class="app-item" onclick="openWindow('win-pc'); cerrarTodo();"><span>🖥️ Este Equipo</span></div>
+            <div class="app-item" onclick="openWindow('win-notes'); cerrarTodo();"><span>📝 Notas Pro</span></div>
+            <div class="app-item"><span>🌐 Google Chrome</span></div>
+            <div class="app-item"><span>📁 Explorador</span></div>
         </div>
 
-        <!-- Cuadrícula de Mosaicos de la Derecha (Tiles) -->
+        <!-- Mosaicos de la derecha de la Imagen -->
         <div class="start-tiles-grid">
             <div class="tile wide">
                 <span class="tile-icon">📅</span>
                 <span>Calendario de Outlook</span>
             </div>
             <div class="tile green">
-                <span class="tile-icon">🎮</span>
+                <span class="tile-icon">🍬</span>
                 <span>Candy Crush</span>
             </div>
             <div class="tile">
-                <span class="tile-icon">☁️</span>
-                <span>El Tiempo - 24°C</span>
+                <span class="tile-icon">☀️</span>
+                <span>El Tiempo - 24°</span>
             </div>
             <div class="tile">
-                <span class="tile-icon">🛒</span>
+                <span class="tile-icon">🛍️</span>
                 <span>Microsoft Store</span>
             </div>
         </div>
@@ -269,3 +250,15 @@
 
     <!-- Ventanas -->
     <div id="win-pc" class="window" onclick="focusWindow('win-pc')">
+        <div class="window-header" onmousedown="dragStart(event, 'win-pc')">
+            <span style="font-size: 12px; color: #333;">Este Equipo</span>
+            <div class="window-controls"><div class="win-btn" onclick="closeWindow('win-pc')">✕</div></div>
+        </div>
+        <div class="window-content"><p>🔵 Disco Local (C:) - 142 GB libres</p></div>
+    </div>
+
+    <div id="win-notes" class="window" onclick="focusWindow('win-notes')">
+        <div class="window-header" onmousedown="dragStart(event, 'win-notes')">
+            <span style="font-size: 12px; color: #333;">Bloc de notas</span>
+            <div class="window-controls"><div class="win-btn" onclick="closeWindow('win-notes')">✕</div></div>
+        </div>
